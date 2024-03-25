@@ -1,0 +1,11 @@
+{% load static %}
+<html>
+<head>
+    <title>LITRevu</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+<h1>Page de base</h1>
+<div class="main">{% block content %}{% endblock content %}</div>
+</body>
+</html>
