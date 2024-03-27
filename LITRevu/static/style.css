@@ -1,3 +1,229 @@
+body {
+    background-color: #027373;
+    color: #EFFBFD;
+    font-family: sans-serif;
+}
+
 h1 {
     color: blue;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 60%;
+    margin: 0 auto;
+}
+
+nav p a {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 1.5rem;
+}
+
+nav img {
+    max-height: 40px;
+}
+
+
+nav a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:visited {
+    color: inherit;
+}
+
+nav a:hover {
+    opacity:.9;
+}
+
+.book_cover_details {
+    max-height: 230px;
+    width: auto;
+}
+
+div.main {
+    width: 45%;
+    margin: 0 auto;
+    border: 1px solid #EFFBFD;
+    border-radius: 15px;
+    background-color: #EFFBFD;
+    color: #0D0D0D;
+}
+
+div.login_signup_choice {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-evenly;
+    padding: 20px;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+div.login_signup_choice hr {
+    margin: 2rem;
+}
+
+button.signup, .create-review-button {
+    font-family: Roboto, sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: #EFFBFD;
+    background-color: #5291d9;
+    padding: 10px 30px;
+    border: none;
+    box-shadow: none;
+    border-radius: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+button.login {
+    background-color: #0f624c;
+}
+
+.enter_method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.enter_method form {
+    margin: 0;
+}
+
+.enter_method div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.enter_method form input {
+    border: 1px solid #b7b7b7;
+    border-radius: 50px;
+    padding: 15px;
+}
+
+
+.rating-star {
+    width: 20px;
+    height: auto;
+}
+
+.details {
+    padding: 30px;
+    display: flex;
+}
+
+.home {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbuttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navbuttons a, button {
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.navbuttons button {
+    background-color: #fff;
+    border: none;
+    padding: 8px;
+    color: #0f624c;
+    font-weight: bold;
+    border-radius: 50px;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 120ms;
+}
+
+.navbuttons button:hover {
+    opacity: .8;
+}
+
+.navbuttons form {
+    margin: 0 auto;
+}
+
+.user-content {
+
+}
+
+.book-details {
+
+}
+
+.main-buttons {
+    width: 40%;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.main-buttons button {
+    background-color: white;
+    padding: 15px;
+    border-radius: 50px;
+    color: #027373;
+    font-weight: bold;
+    border: none;
+    font-size: 1.2rem;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 120ms;
+}
+
+.main-buttons button:hover {
+    opacity: .8;
+}
+
+.feed_item {
+    border: 1px solid #d6d8d5;
+    padding: 15px;
+    margin: 5px;
+}
+
+.ticket-response {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border: 1px solid #d6d8d5;
+    margin-top: 5px;
+}
+
+.ticket-response img {
+    max-width: 160px;
+}
+
+.overlook {
+    display: flex;
+    flex-direction: row;
+}
+
+.overlook span {
+    padding: 0 15px 0 15px;
 }

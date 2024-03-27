@@ -1,5 +1,63 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<h2>home.html</h2>
-<p>Bienvenue à l'interieur du site</p>
+<div class="home">
+    <h2>Feed</h2>
+    {% for item in feed %}
+        <div class="feed_item">
+            <a href="{% url 'item_details' item.1 item.0.id %}">
+                {% if item.1 == "ticket" %}
+                    <b>{{ item.0.author }}</b> a publié une demande de critique :
+                {% elif item.1 == "review" %}
+                    <b>{{ item.0.author }}</b> a publié une critique :
+                {% endif %}
+                <p>{{ item.0.date }}</p>
+                {% if item.1 == "review" %}
+                <div class="overlook">❝ {{ item.0.title }} ❞<span> - </span>
+                    <div class="rating">
+                        {% if item.0.rating >= 1 %}
+                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                        {% else %}
+                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                        {% endif %}
+                        {% if item.0.rating >= 2 %}
+                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                        {% else %}
+                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                        {% endif %}
+                        {% if item.0.rating >= 3 %}
+                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                        {% else %}
+                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                        {% endif %}
+                        {% if item.0.rating >= 4 %}
+                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                        {% else %}
+                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                        {% endif %}
+                        {% if item.0.rating >= 5 %}
+                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                        {% else %}
+                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if item.0.ticket %}
+                    <div class="ticket-response">
+                        {{ item.0.author }}
+                        <b>{{ item.0.ticket }}</b>
+                        {{ item.0.book.title }}
+                        <img alt="book cover" src="{{ item.0.book.book_cover.url }}">
+                    </div>
+                {% else %}
+                    {{ item.0 }}
+                {% endif %}
+
+        </a>
+    </div>
+    {% endfor %}
+</div>
 {% endblock content %}
+
+

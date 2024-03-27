@@ -5,7 +5,23 @@
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
-<h1>Page de base</h1>
+<nav>
+    <p><a href="{% url 'home' %}"><img alt="logo" class="logo" src="{% static 'logo.png' %}">LITRevu</a></p>
+    {% if user.is_authenticated %}
+        <div class="navbuttons">
+            <a href="{% url 'home' %}">Flux</a>
+            <a>Posts</a>
+            <a>Abonnements</a>
+            <form method="post" action="{% url 'logout' %}"><button type="submit"> {% csrf_token %}Se déconnecter</button></form>
+        </div>
+    {% endif %}
+</nav>
+{% if user.is_authenticated %}
+    <div class="main-buttons">
+        <a href="{% url 'create_ticket' %}"><button class="">Demander une critique</button></a>
+        <a href="{% url 'create_review' %}"><button class="">Déposer une critique</button></a>
+    </div>
+{% endif %}
 <div class="main">{% block content %}{% endblock content %}</div>
 </body>
 </html>

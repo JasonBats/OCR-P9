@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<main class="details">
+    {% if details_type == 'ticket' %}
+        <div class="user-content">
+            <h2>Demande de critique à propos de {{ book.title }}</h2>
+            <p>Demande formulée par <b>{{ item.author }}</b></p>
+            <p>Le {{ item.date }}</p>
+            <p><button class="create-review-button"><a href="{% url 'create_review' %}">Déposer une critique</a></button></p>
+        </div>
+    {% elif details_type == 'review' %}
+        <div class="user-content">
+            <h2>Critique de {{ book.title }}</h2>
+            <h3>{{ item.author }} : ❝ {{ item.title }} ❞</h3>
+            <div class="rating">
+                {% if item.rating >= 1 %}
+                    <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                {% else %}
+                    <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                {% endif %}
+                {% if item.rating >= 2 %}
+                    <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                {% else %}
+                    <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                {% endif %}
+                {% if item.rating >= 3 %}
+                    <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                {% else %}
+                    <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                {% endif %}
+                {% if item.rating >= 4 %}
+                    <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                {% else %}
+                    <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                {% endif %}
+                {% if item.rating >= 5 %}
+                    <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                {% else %}
+                    <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                {% endif %}
+            </div>
+        <p>Date de la critique : {{ item.date }}</p>
+        <p> {{ item.review_text }}</p>
+        </div>
+        {% endif %}
+        <hr style="opacity: 0">
+        <div class="book-details">
+            <h3>Détails de {{ book.title }}</h3>
+            <p>Auteur : <b>{{ book.author}}</b></p>
+            <p>Parution en <b>{{ book.date}}</b></p>
+            <img alt="Book cover" class="book_cover_details" src="{{ book.book_cover.url }}">
+        </div>
+
+</main>
+{% endblock content %}

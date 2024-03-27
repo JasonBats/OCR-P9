@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Liste des objets vraiment créés</h2>
+<h3>Livres</h3>
+{% for book in books %}
+    <p>{{ book.title }}</p>
+    <p>{{ book.date }}</p>
+    <p>{{ book.author }}</p>
+    <img src="{{ book.book_cover.url }}">
+    <hr>
+{% endfor %}
+<h3>Tickets</h3>
+{% for ticket in tickets %}
+    <p>{{ ticket.author }}</p>
+    <p>{{ ticket.date }}</p>
+    <p>{{ ticket.book.title }}</p>
+    <hr>
+{% endfor %}
+{% for review in reviews %}
+    <p>{{ review.book }}</p>
+    <p>{{ review.date }}</p>
+    <hr>
+{% endfor %}
+{% endblock content %}
