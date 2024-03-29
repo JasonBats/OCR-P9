@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+import authentication.models as auth_models
 from . import forms, models
 import datetime
+
+from django.contrib import messages
 
 
 @login_required
@@ -78,3 +81,37 @@ def item_details(request, item_id, item_type):  # item_type pour savoir si il fa
         details_type = 'review'
     book = item.book
     return render(request, 'blog/item_details.html', context={'item': item, 'book': book, 'details_type': details_type})
+
+
+def relations(request):
+    users = auth_models.User.objects.all()
+    public_users = []
+    for user in users:
+        if not user.is_staff:
+            public_users.append(user)
+    sorted_users = sorted(public_users, key=lambda u: u.username)
+    followed_users = request.user.followers.all()
+    followed_by = request.user.followed_by.all()
+    current_user = request.user
+    return render(request,
+                  'blog/relations.html',
+                  context={'sorted_users': sorted_users,
+                           'followed_users': followed_users,
+                           'current_user': current_user,
+                           'followed_by': followed_by})
+
+
+def manage_users_relations(request):
+    if request.method == 'POST':
+        user = request.user
+        followers = []
+        for other_member in user.followers.all():
+            followers.append(other_member)
+        user_to_verify = request.POST.get('user_to_verify')
+        user_to_verify = auth_models.User.objects.get(pk=user_to_verify)
+        if user_to_verify not in followers:
+            user.followers.add(user_to_verify)
+        else:
+            user.followers.remove(user_to_verify)
+
+    return redirect('relations')

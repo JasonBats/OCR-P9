@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="home">
+    <h2>Liste des membres :</h2>
+    <div class="user-list">
+    {% for user in sorted_users %}
+        {% if user not in followed_users %}
+            <form action="{% url 'manage_relations' %}" method="post">
+                {% csrf_token %}
+                <p>{{ user.username }} id : {{ user.id }} <button type="submit" class="follow">Suivre</button></p>
+                <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+            </form>
+        {% elif user in followed_users %}
+            <form action="{% url 'manage_relations' %}" method="post">
+                {% csrf_token %}
+                <p>{{ user.username }} <button style="background-color: #027373;color: white;">Suivi(e)</button></p>
+                <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+            </form>
+        {% else %}
+            <p>wtf</p>
+        {% endif %}
+    {% endfor %}
+    </div>
+    <h2>Membres suivis :</h2>
+    <div class="user-list">
+    {% for user in followed_users %}
+        <p>{{ user.username }}</p>
+    {% endfor %}
+    </div>
+    <h2>Abonné(e)s</h2>
+    <div class="user-list">
+        {% for user in followed_by %}
+            <p>{{ user.username }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+

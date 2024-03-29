@@ -1,5 +1,5 @@
 from django import forms
-
+import authentication.models as auth_models
 from . import models
 
 

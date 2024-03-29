@@ -11,7 +11,7 @@
         <div class="navbuttons">
             <a href="{% url 'home' %}">Flux</a>
             <a>Posts</a>
-            <a>Abonnements</a>
+            <a href="{% url 'relations' %}">Abonnements</a>
             <form method="post" action="{% url 'logout' %}"><button type="submit"> {% csrf_token %}Se déconnecter</button></form>
         </div>
     {% endif %}
@@ -23,5 +23,8 @@
     </div>
 {% endif %}
 <div class="main">{% block content %}{% endblock content %}</div>
+{% if user.is_authenticated %}
+    <p>Bonjour {{ user }}</p>
+{% endif %}
 </body>
 </html>

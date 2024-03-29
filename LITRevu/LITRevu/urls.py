@@ -19,7 +19,9 @@ urlpatterns = [
     path('explore_db/', blog.views.explore_db, name='explore_db'),
     path('blog/books/<int:book_id>/', blog.views.book_details, name='book_details'),
     path('blog/item_details/<str:item_type>/<int:item_id>/', blog.views.item_details, name='item_details'),
-    path('create_review/', blog.views.create_review, name='create_review')
+    path('create_review/', blog.views.create_review, name='create_review'),
+    path('relations/', blog.views.relations, name='relations'),
+    path('manage_relations', blog.views.manage_users_relations, name='manage_relations')
 ]
 
 if settings.DEBUG:

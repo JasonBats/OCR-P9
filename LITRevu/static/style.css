@@ -227,3 +227,35 @@ button.login {
 .overlook span {
     padding: 0 15px 0 15px;
 }
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.user-list p {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+    margin: 5px;
+    padding: 15px;
+    align-items: center;
+    border-radius: 12px;
+}
+
+.user-list input {
+    background-color: white;
+    padding: 10px;
+    color: #027373;
+    font-weight: bold;
+    border-radius: 8px;
+    border: 2px solid #027373;
+}
+
+.user-list .follow:hover {
+    background-color: #027373;
+    color: white;
+}
