@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Suppression de ticket - demande de critique</h2>
+<h3>Livre</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ book.title }}
+    {{ book.author }}
+    {{ book.date }}
+    <p>
+        {{ form.as_p }}
+    </p>
+    <button type="submit">Supprimer</button>
+</form>
+{% endblock content %}

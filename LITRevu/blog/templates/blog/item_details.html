@@ -12,7 +12,7 @@
     {% elif details_type == 'review' %}
         <div class="user-content">
             <h2>Critique de {{ book.title }}</h2>
-            <h3>{{ item.author }} : ❝ {{ item.title }} ❞</h3>
+            <h3>{{ item.author }} : ❝ {{ item.review_title }} ❞</h3>
             <div class="rating">
                 {% if item.rating >= 1 %}
                     <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>

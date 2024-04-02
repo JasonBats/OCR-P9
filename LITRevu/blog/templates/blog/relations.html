@@ -8,7 +8,7 @@
         {% if user not in followed_users %}
             <form action="{% url 'manage_relations' %}" method="post">
                 {% csrf_token %}
-                <p>{{ user.username }} id : {{ user.id }} <button type="submit" class="follow">Suivre</button></p>
+                <p>{{ user.username }}<button type="submit" class="follow">Suivre</button></p>
                 <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
             </form>
         {% elif user in followed_users %}

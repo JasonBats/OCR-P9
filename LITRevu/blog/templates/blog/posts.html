@@ -6,11 +6,27 @@
     {% for item in feed %}
         <div class="feed_item">
             <a href="{% url 'item_details' item.1 item.0.id %}">
+            <div class="intro">
+            {% if item.0.author == user %}
+                <div class="crud">
+                    <form action="{% url 'edit_ticket' item.0.book.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_to_edit" value="{{ item.0.book.id }}">
+                        <button type="submit" >{{ item.0.book.id }} modifier</button>
+                    </form>
+                    <form action="{% url 'delete_item' item.1 item.0.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_to_delete" value="{{ item.0.id }}, {{ item.1 }}">
+                        <button type="submit" >{{ item.0.id }} supprimer</button>
+                    </form>
+                </div>
+            {% endif %}
                 {% if item.1 == "ticket" %}
-                    <b>{{ item.0.author }}</b> a publié un ticket :
+                    <div><b>{{ item.0.author }}</b> a publié un ticket :</div>
                 {% elif item.1 == "review" %}
-                    <b>{{ item.0.author }}</b> a publié une critique :
+                    <div><b>{{ item.0.author }}</b> a publié une critique :</div>
                 {% endif %}
+            </div>
                 <p>{{ item.0.date }}</p>
                 {% if item.1 == "review" %}
                 <div class="overlook">❝ {{ item.0.title }} ❞<span> - </span>
@@ -57,7 +73,8 @@
                     <img alt="book cover" src="{{ item.0.book.book_cover.url }}">
                     </div>
                 {% endif %}
-            </a>
+
+        </a>
     </div>
     {% endfor %}
 </div>

@@ -219,6 +219,15 @@ button.login {
     max-width: 160px;
 }
 
+.ticket-request {
+    display: flex;
+    flex-direction: column;
+}
+
+.ticket-request img {
+    max-width: 160px;
+}
+
 .overlook {
     display: flex;
     flex-direction: row;
@@ -246,7 +255,7 @@ button.login {
     border-radius: 12px;
 }
 
-.user-list input {
+.user-list button {
     background-color: white;
     padding: 10px;
     color: #027373;
@@ -258,4 +267,15 @@ button.login {
 .user-list .follow:hover {
     background-color: #027373;
     color: white;
+}
+
+.intro {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.review-creation {
+    display: flex;
+    flex-direction: row;
 }

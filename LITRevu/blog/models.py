@@ -18,7 +18,7 @@ class Book(models.Model):
 class Ticket(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True, verbose_name='Date de publication')
-    book = models.ForeignKey(Book, null=True, on_delete=models.SET_NULL, blank=False, verbose_name='Livre')
+    book = models.ForeignKey(Book, null=True, on_delete=models.CASCADE, blank=False, verbose_name='Livre')
 
     def __str__(self):
         return f'Demande de critique à propos de : {self.book.title}'
@@ -36,12 +36,11 @@ class Review(models.Model):
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True, verbose_name='Date de publication')
-    title = models.CharField(max_length=64, blank=False, verbose_name='Titre de la critique')
+    review_title = models.CharField(max_length=64, blank=False, verbose_name='Titre de la critique')
     rating = models.IntegerField(choices=RATING_CHOICES, verbose_name='Note')
-    book = models.ForeignKey(Book, null=False, on_delete=models.PROTECT, blank=False)
+    book = models.ForeignKey(Book, null=False, on_delete=models.PROTECT, blank=True)
     ticket = models.ForeignKey(Ticket, null=True, blank=True, on_delete=models.SET_NULL)
     review_text = models.CharField(max_length=1000, blank=False, verbose_name='Votre critique')
 
     def __str__(self):
         return f'Critique de : {self.book.title}'
-

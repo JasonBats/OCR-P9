@@ -10,7 +10,7 @@
     {% if user.is_authenticated %}
         <div class="navbuttons">
             <a href="{% url 'home' %}">Flux</a>
-            <a>Posts</a>
+            <a href="{% url 'posts' %}">Posts</a>
             <a href="{% url 'relations' %}">Abonnements</a>
             <form method="post" action="{% url 'logout' %}"><button type="submit"> {% csrf_token %}Se déconnecter</button></form>
         </div>
