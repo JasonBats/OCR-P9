@@ -4,11 +4,16 @@
 <h3>Livre</h3>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ book.title }}
-    {{ book.author }}
-    {{ book.date }}
+    {{ ticket.book }}
+    {{ ticket.author }}
+    {{ ticket.date }} <!-- TODO -->
     <p>
+        {{ form.fields.author.initial }}
+        {{ form.fields.date.initial }}
+        {{ form.fields.book.initial }}
+
         {{ form.as_p }}
+
     </p>
     <button type="submit">Enregistrer la demande</button>
 </form>

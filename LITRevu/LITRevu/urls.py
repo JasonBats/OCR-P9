@@ -23,8 +23,9 @@ urlpatterns = [
     path('create_review/', blog.views.create_review, name='create_review'),
     path('relations/', blog.views.relations, name='relations'),
     path('manage_relations', blog.views.manage_users_relations, name='manage_relations'),
-    path('edit_ticket/<int:book_id>/', blog.views.edit_ticket, name='edit_ticket'),
+    path('edit_ticket/<int:ticket_id>/', blog.views.edit_ticket, name='edit_ticket'),  # TODO : ici
     path('delete_item/<str:item_type>/<int:item_id>/', blog.views.delete_item, name='delete_item'),
+    path('just_book_form/', blog.views.just_book_form, name="just_book_form"),
 ]
 
 if settings.DEBUG:

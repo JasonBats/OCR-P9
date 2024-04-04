@@ -1,35 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Création de reviews</h2>
-<h3>Livre</h3>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="review-creation">
-    <div>{{ review_form.as_p }}</div>
-    <div id="new_book_form" style="display:none;">{{ book_form.as_p }}</div>
-    </div>
-    <a href="#" onclick="toggleNewBookForm()">Nouveau livre</a>
-    <button type="submit">Enregistrer la review</button>
-    {% for field in review_form %}
-        {% if field.errors %}
-          <div class="error">{{ field.errors }}</div>
-        {% endif %}
-      {% endfor %}
-
-      {% for field in book_form %}
-        {% if field.errors %}
-          <div class="error">{{ field.errors }}</div>
-        {% endif %}
-      {% endfor %}
-</form>
+<div class="content-creation-form">
+    <h2>Création de reviews</h2>
+    <h3>Livre</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="review-creation">
+        <div>{{ review_form.as_p }}</div>
+        <div id="new_book_form" style="display:none;">test</div>
+        </div>
+        <a href="#" onclick="toggleNewBookForm()">Nouveau livre</a>
+        <button type="submit">Enregistrer la review</button>
+    </form>
     <script>
     function toggleNewBookForm() {
-        var newBookForm = document.getElementById('new_book_form');
+        const newBookForm = document.getElementById('new_book_form');
         if (newBookForm.style.display === 'none') {
             newBookForm.style.display = 'block';
+            fetch('{% url 'just_book_form' %}')
+                .then(response => response.text())
+                .then(data => newBookForm.innerHTML = data)
         } else {
             newBookForm.style.display = 'none';
+            newBookForm.innerHTML = 'rien'
         }
     }
     </script>
+</div>
 {% endblock content %}

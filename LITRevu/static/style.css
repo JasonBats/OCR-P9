@@ -1,7 +1,15 @@
 body {
-    background-color: #027373;
-    color: #EFFBFD;
-    font-family: sans-serif;
+    background-color: #0e1117;
+    color: #C1CAD2;
+    font-family: "Open Sans", sans-serif;
+}
+
+.open-sans {
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
 }
 
 h1 {
@@ -26,7 +34,7 @@ nav p a {
     display:flex;
     flex-direction: row;
     align-items: center;
-    font-family: "Segoe UI", system-ui, sans-serif;
+    /*font-family: "Segoe UI", system-ui, sans-serif;*/
     font-size: 1.5rem;
 }
 
@@ -37,7 +45,7 @@ nav img {
 
 nav a {
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 a:visited {
@@ -58,8 +66,7 @@ div.main {
     margin: 0 auto;
     border: 1px solid #EFFBFD;
     border-radius: 15px;
-    background-color: #EFFBFD;
-    color: #0D0D0D;
+    background-color: #181d27;
 }
 
 div.login_signup_choice {
@@ -77,7 +84,7 @@ div.login_signup_choice hr {
 
 button.signup, .create-review-button {
     font-family: Roboto, sans-serif;
-    font-weight: bold;
+    font-weight: 700;
     font-size: 1.2rem;
     text-decoration: none;
     color: #EFFBFD;
@@ -119,12 +126,6 @@ button.login {
     padding: 15px;
 }
 
-
-.rating-star {
-    width: 20px;
-    height: auto;
-}
-
 .details {
     padding: 30px;
     display: flex;
@@ -152,7 +153,7 @@ button.login {
     border: none;
     padding: 8px;
     color: #0f624c;
-    font-weight: bold;
+    font-weight: 700;
     border-radius: 50px;
     opacity: 1;
     transition-property: opacity;
@@ -189,7 +190,7 @@ button.login {
     padding: 15px;
     border-radius: 50px;
     color: #027373;
-    font-weight: bold;
+    font-weight: 700;
     border: none;
     font-size: 1.2rem;
     opacity: 1;
@@ -203,11 +204,27 @@ button.login {
 
 .feed_item {
     border: 1px solid #d6d8d5;
+    border-radius: 15px;
     padding: 15px;
-    margin: 5px;
+    margin: 15px;
+    position: relative;
+}
+
+.feed_item img {
+    max-width: 200px;
 }
 
 .ticket-response {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr 2fr);
+    grid-column-gap: 15px;
+}
+
+.ticket-response img {
+    max-width: 160px;
+}
+
+.original-post {
     display: flex;
     flex-direction: column;
     padding: 15px;
@@ -215,8 +232,8 @@ button.login {
     margin-top: 5px;
 }
 
-.ticket-response img {
-    max-width: 160px;
+.original-post p {
+    margin: 5px;
 }
 
 .ticket-request {
@@ -252,14 +269,14 @@ button.login {
     margin: 5px;
     padding: 15px;
     align-items: center;
-    border-radius: 12px;
+    border-radius: 15px;
 }
 
 .user-list button {
     background-color: white;
     padding: 10px;
     color: #027373;
-    font-weight: bold;
+    font-weight: 700;
     border-radius: 8px;
     border: 2px solid #027373;
 }
@@ -270,12 +287,80 @@ button.login {
 }
 
 .intro {
+    position: relative;
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: space-between;
+}
+
+.crud {
+    position: absolute;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.crud button {
+    border-radius: 28px;
+    color: #ffffff;
+    font-size: 14px;
+    background-color: #027373;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+    border: none;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 120ms;
+}
+
+.crud button:hover {
+    opacity: .8;
 }
 
 .review-creation {
     display: flex;
     flex-direction: row;
 }
+
+.content-creation-form {
+    padding: 30px;
+}
+
+.label {
+    color: #EFFBFD;
+    padding: 2px 10px;
+    margin: 0 5px;
+    border-radius: 50px;
+    font-size: 12px;
+}
+
+.ticket-response-button {
+    background-color: red;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: #EFFBFD;
+    background-color: #027373;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 120ms;
+}
+
+.ticket-response-button:hover {
+    opacity: .8;
+}
+
+.ticket-response-button:visited {
+    text-decoration: none;
+    color: #EFFBFD;
+}
+
+.review-abstract {
+    display: flex;
+    flex-direction: row;
+}
+
+.review-abstract-text {
+    margin: 1em;
+}
+

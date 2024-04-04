@@ -1,66 +1,66 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+{% load custom_filters %}
 <div class="home">
     <h2>Feed</h2>
     {% for item in feed %}
         <div class="feed_item">
             <a href="{% url 'item_details' item.1 item.0.id %}">
-                {% if item.1 == "ticket" %}
-                    <b>{{ item.0.author }}</b> a publié un ticket :
-                {% elif item.1 == "review" %}
-                    <b>{{ item.0.author }}</b> a publié une critique :
-                {% endif %}
-                <p>{{ item.0.date }}</p>
-                {% if item.1 == "review" %}
-                <div class="overlook">❝ {{ item.0.title }} ❞<span> - </span>
-                    <div class="rating">
-                        {% if item.0.rating >= 1 %}
-                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
-                        {% else %}
-                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
-                        {% endif %}
-                        {% if item.0.rating >= 2 %}
-                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
-                        {% else %}
-                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
-                        {% endif %}
-                        {% if item.0.rating >= 3 %}
-                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
-                        {% else %}
-                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
-                        {% endif %}
-                        {% if item.0.rating >= 4 %}
-                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
-                        {% else %}
-                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
-                        {% endif %}
-                        {% if item.0.rating >= 5 %}
-                            <object class="rating-star yellow-star" type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
-                        {% else %}
-                            <object class="rating-star grey-star" type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
-                        {% endif %}
-                    </div>
+            <div class="intro">
+            {% if item.0.author == user %}
+                <div class="crud">
+                    <form action="{% url 'edit_ticket' item.0.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="ticket_to_edit" value="{{ item.0.id }}">
+                        <button type="submit" >Modifier</button>
+                    </form>
+                    <form action="{% url 'delete_item' item.1 item.0.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_to_delete" value="{{ item.0.id }}, {{ item.1 }}">
+                        <button type="submit" >Supprimer</button>
+                    </form>
                 </div>
+            {% endif %}
+                {% if item.1 == "ticket" %}
+                    <span class="label" style="background-color:#E1341E;">ticket</span><div><b>{{ item.0.author }}</b> a publié un ticket :</div>
+                {% elif item.1 == "review" %}
+                    <span class="label" style="background-color:#1697a7;">critique</span><div><b>{{ item.0.author }}</b> a publié une critique :</div>
                 {% endif %}
+            </div>
+                <p class="timestamp"><i>{{ item.0.date }}</i></p>
+                <!-- -------------------- DEBUT NOUVEAU SCRIPT ICI -------------------- -->
+                <p>{% if item.1 == "review" %}
+                    {% for rank in item.0.rating|get_range %}
+                        <object type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                    {% endfor %}
+                    {% for rank in item.0.rating|get_range_two_values:5 %}
+                        <object type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                    {% endfor %}
+                {% endif %}</p>
+                <!-- -------------------- FIN NOUVEAU SCRIPT ICI -------------------- -->
                 {% if item.0.ticket %}
                     <div class="ticket-response">
-                        {{ item.0.ticket.author }}
-                        <b>{{ item.0.ticket }}</b>
-                        {{ item.0.book.title }}
-                        <img alt="book cover" src="{{ item.0.book.book_cover.url }}">
+                        <div class="original-post">
+                            <p><span class="label" style="background-color:#E1341E;">ticket</span><b>{{ item.0.ticket.author }}</b></p>
+                            <p>{{ item.0.ticket }}</p>
+                            <p><img alt="book cover" src="{{ item.0.book.book_cover.url }}"></p>
+                        </div>
+                        <p>{{ item.0.review_text }}</p>
                     </div>
                 {% else %}
-                    <div class="ticket-request">
-                    {{ item.0 }}
-                    {{ item.0.book.author }}
-                    <img alt="book cover" src="{{ item.0.book.book_cover.url }}">
+                    <p><b>{{ item.0 }}</b> de {{ item.0.book.author }}</p>
+                    <div class="review-abstract">
+                        <p><img alt="book cover" src="{{ item.0.book.book_cover.url }}"></p>
+                        <p class="review-abstract-text">{{ item.0.review_text }}</p>
                     </div>
                 {% endif %}
-            </a>
+                {% if item.1 == "ticket" and item.0.author != user %} <!-- Ne pas pas s'auto-répondre -->
+                    <a class="ticket-response-button" href="{% url 'create_review' %}">Répondre</a>
+                {% endif %}
+
+        </a>
     </div>
     {% endfor %}
 </div>
 {% endblock content %}
-
-

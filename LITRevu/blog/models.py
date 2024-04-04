@@ -6,7 +6,7 @@ import datetime
 
 class Book(models.Model):
     current_year = datetime.date.today().year
-    title = models.CharField(max_length=255, blank=False, verbose_name='Titre')
+    title = models.CharField(max_length=255, blank=False, verbose_name='Titre du livre')
     author = models.CharField(max_length=100, blank=False, verbose_name='Auteur')
     date = models.IntegerField(verbose_name='Date de publication', validators=[MinValueValidator(0), MaxValueValidator(current_year)])
     book_cover = models.ImageField(verbose_name='Couverture')
@@ -15,7 +15,7 @@ class Book(models.Model):
         return f'Titre du livre : {self.title}'
 
 
-class Ticket(models.Model):
+class Ticket(models.Model):  # TODO : ici
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True, verbose_name='Date de publication')
     book = models.ForeignKey(Book, null=True, on_delete=models.CASCADE, blank=False, verbose_name='Livre')

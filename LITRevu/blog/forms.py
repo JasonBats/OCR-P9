@@ -14,6 +14,11 @@ class CreateTicketForm(forms.ModelForm):
 
 
 class CreateBookForm(forms.ModelForm):
+    title = forms.CharField(required=False)
+    author = forms.CharField(required=False)
+    date = forms.IntegerField(required=False)
+    book_cover = forms.ImageField(required=False)
+
     class Meta:
         model = models.Book
         fields = ['title', 'author', 'date', 'book_cover']
@@ -28,7 +33,7 @@ class CreateReviewForm(forms.ModelForm):
         }
 
 
-class EditBookForm(forms.ModelForm):
+class EditBookForm(forms.ModelForm):  # TODO : ici
     class Meta:
-        model = models.Book
-        fields = ['title', 'author', 'date', 'book_cover']
+        model = models.Ticket
+        fields = ['book', 'author']

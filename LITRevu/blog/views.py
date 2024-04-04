@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 import authentication.models as auth_models
 from . import forms, models
 import datetime
+from django.templatetags.static import static
 
 from django.contrib import messages
 
@@ -16,14 +17,19 @@ def home(request):
     feed = []
     for ticket in tickets:
         ticket_details = (ticket, 'ticket')
-        if ticket.author in user_followers:
+        if ticket.author in user_followers or ticket.author == user:
             feed.append(ticket_details)
     for review in reviews:
         review_details = (review, 'review')
-        if review.author in user_followers:
+        if review.author in user_followers or review.author == user:
             feed.append(review_details)
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
-    return render(request, 'blog/home.html', context={'feed': sorted_feed, 'user_followers': user_followers, 'user': user})
+    return render(request, 'blog/home.html',
+                  context={'feed': sorted_feed,
+                           'user_followers': user_followers,
+                           'user': user,
+                           }
+                  )
 
 
 def posts(request):
@@ -38,7 +44,11 @@ def posts(request):
         review_details = (review, 'review')
         feed.append(review_details)
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
-    return render(request, 'blog/posts.html', context={'feed': sorted_feed,  'user': user})
+    return render(request, 'blog/home.html',
+                  context={'feed': sorted_feed,
+                           'user': user,
+                           }
+                  )
 
 
 def create_ticket(request):
@@ -73,7 +83,7 @@ def create_review(request):
                 review_instance = models.Review.objects.create(
                     author=request.user,
                     date=datetime.datetime.now(),
-                    title=review_form.cleaned_data['review_title'],
+                    review_title=review_form.cleaned_data['review_title'],
                     rating=review_form.cleaned_data['rating'],
                     book=review_form.cleaned_data['book'],
                     ticket=review_form.cleaned_data['ticket'],
@@ -82,6 +92,12 @@ def create_review(request):
             elif book_form.is_valid():
                 print('book_form.is_valid() TRUE')
                 book_instance = book_form.save()
+                book_db = models.Book.objects.create(
+                    title=book_form.cleaned_data['title'],
+                    author=book_form.cleaned_data['author'],
+                    date=book_form.cleaned_data['date'],
+                    book_cover=book_form.cleaned_data['book_cover']
+                )
                 review_instance = review_form.save(commit=False)
                 review_instance.author = request.user
                 review_instance.date = datetime.datetime.now()
@@ -152,16 +168,19 @@ def manage_users_relations(request):
     return redirect('relations')
 
 
-def edit_ticket(request, book_id):
-    book = models.Book.objects.get(id=book_id)
-    form = forms.EditBookForm(instance=book)
+def edit_ticket(request, ticket_id):
+    ticket = models.Ticket.objects.get(id=ticket_id)
+    book = ticket.book
+    initial_data = {'book': 5}  # TODO : ici
+    form = forms.EditBookForm(initial=initial_data)
     if request.method == 'POST':
-        form = forms.EditBookForm(data=request.POST, instance=book)
+        form = forms.EditBookForm(data=request.POST, instance=ticket, files=request.FILES)
         print(form.data)
         if form.is_valid():
             form.save(commit=False)
             return redirect('home')
-    return render(request, 'blog/edit_ticket.html', context={'form': form, 'book': book})
+    print(form['author'].initial)
+    return render(request, 'blog/edit_ticket.html', context={'form': form, 'book': book, 'ticket': ticket})
 
 
 def delete_item(request, item_id, item_type):
@@ -175,3 +194,8 @@ def delete_item(request, item_id, item_type):
         return redirect('home')
 
     return render(request, 'blog/delete_ticket.html', context={'item': item})
+
+
+def just_book_form(request):
+    form = forms.CreateBookForm()
+    return render(request, 'blog/isolated_book_form.html', context={'form': form})
