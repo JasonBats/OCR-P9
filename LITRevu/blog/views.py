@@ -3,8 +3,6 @@ from django.contrib.auth.decorators import login_required
 import authentication.models as auth_models
 from . import forms, models
 import datetime
-from django.templatetags.static import static
-
 from django.contrib import messages
 
 
@@ -12,6 +10,7 @@ from django.contrib import messages
 def home(request):
     user = request.user
     user_followers = user.followers.all()
+    print(user_followers)
     tickets = models.Ticket.objects.all()
     reviews = models.Review.objects.all()
     feed = []
@@ -38,11 +37,13 @@ def posts(request):
     reviews = models.Review.objects.all()
     feed = []
     for ticket in tickets:
-        ticket_details = (ticket, 'ticket')
-        feed.append(ticket_details)
+        if ticket.author != user:
+            ticket_details = (ticket, 'ticket')
+            feed.append(ticket_details)
     for review in reviews:
-        review_details = (review, 'review')
-        feed.append(review_details)
+        if review.author != user:
+            review_details = (review, 'review')
+            feed.append(review_details)
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
     return render(request, 'blog/home.html',
                   context={'feed': sorted_feed,
@@ -63,6 +64,7 @@ def create_ticket(request):
                 book=book_instance,
                 date=now
             )
+            models.Ticket.objects.filter(id=ticket_instance.id).update(date=datetime.datetime.now())
             return render(request, 'blog/ticket_confirmation.html', context={'book': book_instance})
     else:
         form1 = forms.CreateBookForm()
@@ -76,10 +78,8 @@ def create_review(request):
     if request.method == 'POST':
         review_form = forms.CreateReviewForm(request.POST)
         book_form = forms.CreateBookForm(request.POST, request.FILES)
-        print(request.POST)
         if review_form.is_valid():
             if request.POST['book']:
-                print('book bien trouvé dans request.POST')
                 review_instance = models.Review.objects.create(
                     author=request.user,
                     date=datetime.datetime.now(),
@@ -89,24 +89,17 @@ def create_review(request):
                     ticket=review_form.cleaned_data['ticket'],
                     review_text=review_form.cleaned_data['review_text'],
                 )
+                models.Review.objects.filter(id=review_instance.id).update(date=datetime.datetime.now())
             elif book_form.is_valid():
-                print('book_form.is_valid() TRUE')
                 book_instance = book_form.save()
-                book_db = models.Book.objects.create(
-                    title=book_form.cleaned_data['title'],
-                    author=book_form.cleaned_data['author'],
-                    date=book_form.cleaned_data['date'],
-                    book_cover=book_form.cleaned_data['book_cover']
-                )
                 review_instance = review_form.save(commit=False)
                 review_instance.author = request.user
                 review_instance.date = datetime.datetime.now()
                 review_instance.book = book_instance
                 review_instance.save()
+                models.Review.objects.filter(id=review_instance.id).update(date=datetime.datetime.now())
             else:
-                print('bah aucun valide en fait')
                 messages.error(request, 'formulaires pas valides')
-            print(request.POST)
             return render(request, 'blog/create_review.html', context={'review_form': review_form, 'book_form': book_form})
     return render(request, 'blog/create_review.html', context={'review_form': review_form, 'book_form': book_form})
 
@@ -135,15 +128,16 @@ def item_details(request, item_id, item_type):  # item_type pour savoir si il fa
 
 
 def relations(request):
+    current_user = request.user
     users = auth_models.User.objects.all()
     public_users = []
     for user in users:
         if not user.is_staff:
             public_users.append(user)
+    public_users.remove(current_user)
     sorted_users = sorted(public_users, key=lambda u: u.username)
     followed_users = request.user.followers.all()
     followed_by = request.user.followed_by.all()
-    current_user = request.user
     return render(request,
                   'blog/relations.html',
                   context={'sorted_users': sorted_users,
@@ -168,19 +162,38 @@ def manage_users_relations(request):
     return redirect('relations')
 
 
-def edit_ticket(request, ticket_id):
+def edit_ticket(request, ticket_id, book_id):
     ticket = models.Ticket.objects.get(id=ticket_id)
-    book = ticket.book
-    initial_data = {'book': 5}  # TODO : ici
-    form = forms.EditBookForm(initial=initial_data)
+    book = models.Book.objects.get(id=book_id)
+    form = forms.EditBookForm(instance=book)
     if request.method == 'POST':
-        form = forms.EditBookForm(data=request.POST, instance=ticket, files=request.FILES)
-        print(form.data)
+        form = forms.EditBookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save(commit=False)
+            form.save()
+            models.Ticket.objects.filter(id=ticket_id).update(date=datetime.datetime.now())
             return redirect('home')
-    print(form['author'].initial)
+    else:
+        form = forms.EditBookForm(instance=book)
+        print('passé par else:')
     return render(request, 'blog/edit_ticket.html', context={'form': form, 'book': book, 'ticket': ticket})
+
+
+def edit_review(request, review_id, book_id):
+    review = models.Review.objects.get(id=review_id)
+    book = models.Book.objects.get(id=book_id)
+    book_form = forms.CreateBookOptionalForm(instance=book)
+    review_form = forms.EditReviewForm(instance=review)
+    if request.method == 'POST':
+        book_form = forms.CreateBookOptionalForm(request.POST, request.FILES, instance=book)
+        review_form = forms.EditReviewForm(request.POST, instance=review)
+        if book_form.is_valid() and review_form.is_valid():
+            book_form.save()
+            review_form.save()
+            models.Review.objects.filter(id=review_id).update(date=datetime.datetime.now())
+            return redirect('home')
+    else:
+        book_form = forms.CreateBookOptionalForm(instance=book)
+    return render(request, 'blog/edit_review.html', context={'book_form': book_form, 'review_form': review_form, 'book': book, 'review': review})
 
 
 def delete_item(request, item_id, item_type):
@@ -197,5 +210,11 @@ def delete_item(request, item_id, item_type):
 
 
 def just_book_form(request):
-    form = forms.CreateBookForm()
+    form = forms.CreateBookOptionalForm()
     return render(request, 'blog/isolated_book_form.html', context={'form': form})
+
+
+# TODO : Ne pas pouvoir modifier un livre qu'on n'a pas posté | refactor html ticket_confirmation et review_confirmation | Checker les paramètres on_delete (Un user qui delete un livre qu'il a submit doit faire delete tout ce qui concerne ce livre ? etc...)
+
+# DONE : Image par défaut, resize image, fix préremplissage modification de ticket, fix des heures UTC+2,
+# DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user

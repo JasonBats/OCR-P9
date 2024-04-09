@@ -6,15 +6,21 @@
     <h2>Feed</h2>
     {% for item in feed %}
         <div class="feed_item">
-            <a href="{% url 'item_details' item.1 item.0.id %}">
             <div class="intro">
             {% if item.0.author == user %}
                 <div class="crud">
-                    <form action="{% url 'edit_ticket' item.0.id %}" method="post">
+                {% if item.1 == "ticket" %}
+                    <a href="{% url 'edit_ticket' item.0.id item.0.book.id %}">Modifier ticket ?</a>
+                {% elif item.1 == "review" %}
+                    <a href="{% url 'edit_review' item.0.id item.0.book.id %}">Modifier review ?</a>
+                {% endif %}
+                    <!-- ----------------------- vvvvv À SUPPRIMER vvvvv ----------------------- -->
+                    <form action="{% url 'edit_ticket' item.0.id item.0.book.id %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="ticket_to_edit" value="{{ item.0.id }}">
                         <button type="submit" >Modifier</button>
                     </form>
+                    <!-- ----------------------- ^^^^^ À SUPPRIMER ^^^^^ ----------------------- -->
                     <form action="{% url 'delete_item' item.1 item.0.id %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="item_to_delete" value="{{ item.0.id }}, {{ item.1 }}">
@@ -23,9 +29,9 @@
                 </div>
             {% endif %}
                 {% if item.1 == "ticket" %}
-                    <span class="label" style="background-color:#E1341E;">ticket</span><div><b>{{ item.0.author }}</b> a publié un ticket :</div>
+                    <span class="label" style="background-color:#E1341E;">ticket</span><a href="{% url 'item_details' item.1 item.0.id %}"><div><b>{{ item.0.author }}</b> a publié un ticket :</div></a>
                 {% elif item.1 == "review" %}
-                    <span class="label" style="background-color:#1697a7;">critique</span><div><b>{{ item.0.author }}</b> a publié une critique :</div>
+                    <span class="label" style="background-color:#1697a7;">critique</span><a href="{% url 'item_details' item.1 item.0.id %}"><div><b>{{ item.0.author }}</b> a publié une critique :</div></a>
                 {% endif %}
             </div>
                 <p class="timestamp"><i>{{ item.0.date }}</i></p>
@@ -58,8 +64,6 @@
                 {% if item.1 == "ticket" and item.0.author != user %} <!-- Ne pas pas s'auto-répondre -->
                     <a class="ticket-response-button" href="{% url 'create_review' %}">Répondre</a>
                 {% endif %}
-
-        </a>
     </div>
     {% endfor %}
 </div>

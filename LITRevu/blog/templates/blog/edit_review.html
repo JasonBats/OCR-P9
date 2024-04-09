@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Modification de Review</h2>
+<h3>Livre</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>{{ book_form.as_p }}</p>
+    <p>{{ review_form.as_p }}</p>
+    <button type="submit">Enregistrer la review</button>
+</form>
+{% endblock content %}

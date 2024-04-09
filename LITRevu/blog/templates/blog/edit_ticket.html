@@ -5,15 +5,10 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ ticket.book }}
-    {{ ticket.author }}
-    {{ ticket.date }} <!-- TODO -->
+    {{ ticket.book.author }}
+    {{ ticket.date }}
     <p>
-        {{ form.fields.author.initial }}
-        {{ form.fields.date.initial }}
-        {{ form.fields.book.initial }}
-
         {{ form.as_p }}
-
     </p>
     <button type="submit">Enregistrer la demande</button>
 </form>
