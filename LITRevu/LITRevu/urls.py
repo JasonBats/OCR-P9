@@ -27,6 +27,7 @@ urlpatterns = [
     path('edit_review/<int:review_id>/<int:book_id>/', blog.views.edit_review, name='edit_review'),
     path('delete_item/<str:item_type>/<int:item_id>/', blog.views.delete_item, name='delete_item'),
     path('just_book_form/', blog.views.just_book_form, name="just_book_form"),
+    path('create_review_answer_ticket/<int:book_id>/<int:ticket_id>/', blog.views.create_review_answer_ticket, name='create_review_answer_ticket')
 ]
 
 if settings.DEBUG:

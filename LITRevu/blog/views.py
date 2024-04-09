@@ -104,6 +104,30 @@ def create_review(request):
     return render(request, 'blog/create_review.html', context={'review_form': review_form, 'book_form': book_form})
 
 
+def create_review_answer_ticket(request, book_id, ticket_id):
+    book = models.Book.objects.get(id=book_id)
+    ticket = models.Ticket.objects.get(id=ticket_id)
+    review_form = forms.CreateReviewFormAnswerTicket()
+    review_form.book = book
+    if request.method == 'POST':
+        review_form = forms.CreateReviewFormAnswerTicket(request.POST)
+        review_form.book = book_id
+        if review_form.is_valid():
+            print('form is valid oui')
+            review_instance = models.Review.objects.create(
+                author=request.user,
+                date=datetime.datetime.now(),
+                review_title=review_form.cleaned_data['review_title'],
+                rating=review_form.cleaned_data['rating'],
+                book=book,
+                ticket=review_form.cleaned_data['ticket'],
+                review_text=review_form.cleaned_data['review_text'],
+            )
+            models.Review.objects.filter(id=review_instance.id).update(date=datetime.datetime.now())
+            return redirect('home')
+    return render(request, 'blog/create_review_answer_ticket.html', context={'review_form': review_form, 'book': book, 'ticket': ticket})
+
+
 def explore_db(request):
     books = models.Book.objects.all()
     tickets = models.Ticket.objects.all()
@@ -179,6 +203,7 @@ def edit_ticket(request, ticket_id, book_id):
 
 
 def edit_review(request, review_id, book_id):
+    current_user = request.user
     review = models.Review.objects.get(id=review_id)
     book = models.Book.objects.get(id=book_id)
     book_form = forms.CreateBookOptionalForm(instance=book)
@@ -193,7 +218,7 @@ def edit_review(request, review_id, book_id):
             return redirect('home')
     else:
         book_form = forms.CreateBookOptionalForm(instance=book)
-    return render(request, 'blog/edit_review.html', context={'book_form': book_form, 'review_form': review_form, 'book': book, 'review': review})
+    return render(request, 'blog/edit_review.html', context={'book_form': book_form, 'review_form': review_form, 'book': book, 'review': review, 'current_user': current_user})
 
 
 def delete_item(request, item_id, item_type):
@@ -214,7 +239,9 @@ def just_book_form(request):
     return render(request, 'blog/isolated_book_form.html', context={'form': form})
 
 
-# TODO : Ne pas pouvoir modifier un livre qu'on n'a pas posté | refactor html ticket_confirmation et review_confirmation | Checker les paramètres on_delete (Un user qui delete un livre qu'il a submit doit faire delete tout ce qui concerne ce livre ? etc...)
+# TODO : Checker tous les paramètres on_delete (Un user qui delete un livre qu'il a submit doit faire delete tout ce qui concerne ce livre ? etc...)
 
 # DONE : Image par défaut, resize image, fix préremplissage modification de ticket, fix des heures UTC+2,
 # DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user
+# DONE : Ne pas pouvoir modifier un livre qu'on n'a pas posté (ajout champ "submitted_by" à la classe Book
+# DONE : View pour répondre directement à un ticket avec formulaire prérempli et immuable

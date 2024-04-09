@@ -11,6 +11,7 @@ class Book(models.Model):
     author = models.CharField(max_length=100, blank=False, verbose_name='Auteur')
     date = models.IntegerField(verbose_name='Date de publication', validators=[MinValueValidator(0), MaxValueValidator(current_year)])
     book_cover = models.ImageField(verbose_name='Couverture', default='default_book_cover.jpg')
+    submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
 
     IMAGE_MAX_SIZE = (168, 300)
 

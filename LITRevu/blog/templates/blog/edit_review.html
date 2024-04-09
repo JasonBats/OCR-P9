@@ -2,9 +2,14 @@
 {% block content %}
 <h2>Modification de Review</h2>
 <h3>Livre</h3>
+    <p>submitted by {{ book.submitted_by_id }}</p>
+    <p>current user : {{ current_user }}</p>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <p>{{ book_form.as_p }}</p>
+    {% if book.submitted_by == current_user %}
+        <p>Oui c'est bien le user</p>
+        <p>{{ book_form.as_p }}</p>
+    {% endif %}
     <p>{{ review_form.as_p }}</p>
     <button type="submit">Enregistrer la review</button>
 </form>

@@ -62,7 +62,12 @@
                     </div>
                 {% endif %}
                 {% if item.1 == "ticket" and item.0.author != user %} <!-- Ne pas pas s'auto-répondre -->
-                    <a class="ticket-response-button" href="{% url 'create_review' %}">Répondre</a>
+                    <a class="ticket-response-button" href="{% url 'create_review_answer_ticket' item.0.book.id item.0.id %}">Répondre</a>
+                    <p>item.0 : {{ item.0 }}</p>
+                    <p>item.1 : {{ item.1 }}</p>
+                    <p>item.0.book : {{ item.0.book }}</p>
+                    <p>item.0 : {{ item.0.id }}</p>
+                    <p>item.1 : {{ item.1.id }}</p>
                 {% endif %}
     </div>
     {% endfor %}

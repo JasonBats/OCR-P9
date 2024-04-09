@@ -44,6 +44,17 @@ class CreateReviewForm(forms.ModelForm):
         }
 
 
+class CreateReviewFormAnswerTicket(forms.ModelForm):
+    class Meta:
+        model = models.Review
+        fields = ['review_title', 'rating', 'book', 'ticket', 'review_text']
+        widgets = {
+            'review_text': forms.Textarea(),
+            'book': forms.HiddenInput(),
+            'ticket': forms.HiddenInput(),
+        }
+
+
 class EditBookForm(forms.ModelForm):
     title = forms.CharField(required=False)
     author = forms.CharField(required=False)
