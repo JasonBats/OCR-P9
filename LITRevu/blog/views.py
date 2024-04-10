@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 import authentication.models as auth_models
 from . import forms, models
 import datetime
-from django.contrib import messages
 
 
 @login_required
@@ -23,7 +22,7 @@ def home(request):
         if review.author in user_followers or review.author == user:
             feed.append(review_details)
         if review.ticket:
-            if review.ticket.author == user:
+            if review.ticket.author == user and review_details not in feed:
                 feed.append(review_details)  # TODO : Ca en fait du if ici...
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
     return render(request, 'blog/home.html',
@@ -67,12 +66,16 @@ def create_ticket(request):
                 book=book_instance,
                 date=now
             )
-            models.Ticket.objects.filter(id=ticket_instance.id).update(date=datetime.datetime.now())
-            return render(request, 'blog/ticket_confirmation.html', context={'book': book_instance})
-    else:
-        form1 = forms.CreateBookForm()
+            models.Ticket.objects.filter(id=ticket_instance.id).update(
+                date=datetime.datetime.now()
+            )
+            return render(request, 'blog/ticket_confirmation.html',
+                          context={'book': book_instance}
+                          )
 
-    return render(request, 'blog/create_ticket.html', context={'form': form})
+    return render(request, 'blog/create_ticket.html',
+                  context={'form': form}
+                  )
 
 
 def create_review(request):
@@ -92,7 +95,9 @@ def create_review(request):
                     ticket=review_form.cleaned_data['ticket'],
                     review_text=review_form.cleaned_data['review_text'],
                 )
-                models.Review.objects.filter(id=review_instance.id).update(date=datetime.datetime.now())
+                models.Review.objects.filter(id=review_instance.id).update(
+                    date=datetime.datetime.now()
+                )
             elif book_form.is_valid():
                 book_instance = book_form.save()
                 review_instance = review_form.save(commit=False)
@@ -100,11 +105,18 @@ def create_review(request):
                 review_instance.date = datetime.datetime.now()
                 review_instance.book = book_instance
                 review_instance.save()
-                models.Review.objects.filter(id=review_instance.id).update(date=datetime.datetime.now())
-            else:
-                messages.error(request, 'formulaires pas valides')
-            return render(request, 'blog/create_review.html', context={'review_form': review_form, 'book_form': book_form})
-    return render(request, 'blog/create_review.html', context={'review_form': review_form, 'book_form': book_form})
+                models.Review.objects.filter(id=review_instance.id).update(
+                    date=datetime.datetime.now()
+                )
+            # else:
+            #     messages.error(request, 'formulaires pas valides')
+            return render(request, 'blog/create_review.html',
+                          context={'review_form': review_form,
+                                   'book_form': book_form})
+    return render(request, 'blog/create_review.html',
+                  context={'review_form': review_form,
+                           'book_form': book_form}
+                  )
 
 
 def create_review_answer_ticket(request, book_id, ticket_id):
@@ -126,24 +138,36 @@ def create_review_answer_ticket(request, book_id, ticket_id):
                 ticket=review_form.cleaned_data['ticket'],
                 review_text=review_form.cleaned_data['review_text'],
             )
-            models.Review.objects.filter(id=review_instance.id).update(date=datetime.datetime.now())
+            models.Review.objects.filter(id=review_instance.id).update(
+                date=datetime.datetime.now()
+            )
             return redirect('home')
-    return render(request, 'blog/create_review_answer_ticket.html', context={'review_form': review_form, 'book': book, 'ticket': ticket})
+    return render(request, 'blog/create_review_answer_ticket.html',
+                  context={'review_form': review_form,
+                           'book': book,
+                           'ticket': ticket}
+                  )
 
 
 def explore_db(request):
     books = models.Book.objects.all()
     tickets = models.Ticket.objects.all()
     reviews = models.Review.objects.all()
-    return render(request, 'blog/explore_db.html', context={'books': books, 'tickets': tickets, 'reviews': reviews})
+    return render(request, 'blog/explore_db.html',
+                  context={'books': books,
+                           'tickets': tickets,
+                           'reviews': reviews}
+                  )
 
 
 def book_details(request, book_id):
     book = models.Book.objects.get(id=book_id)
-    return render(request, 'blog/book_details.html', context={'book': book})
+    return render(request, 'blog/book_details.html',
+                  context={'book': book}
+                  )
 
 
-def item_details(request, item_id, item_type):  # item_type pour savoir si il faut taper Ticket.objects.all() ou autre chose. Arrive de home.html
+def item_details(request, item_id, item_type):
     reviews_to_display = []
     if item_type == 'ticket':
         item = models.Ticket.objects.get(id=item_id)
@@ -158,7 +182,12 @@ def item_details(request, item_id, item_type):  # item_type pour savoir si il fa
         item = models.Review.objects.get(id=item_id)
         details_type = 'review'
     book = item.book
-    return render(request, 'blog/item_details.html', context={'item': item, 'book': book, 'details_type': details_type, 'reviews_to_display': reviews_to_display})
+    return render(request, 'blog/item_details.html',
+                  context={'item': item,
+                           'book': book,
+                           'details_type': details_type,
+                           'reviews_to_display': reviews_to_display}
+                  )
 
 
 def relations(request):
@@ -204,12 +233,18 @@ def edit_ticket(request, ticket_id, book_id):
         form = forms.EditBookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
             form.save()
-            models.Ticket.objects.filter(id=ticket_id).update(date=datetime.datetime.now())
+            models.Ticket.objects.filter(id=ticket_id).update(
+                date=datetime.datetime.now()
+            )
             return redirect('home')
     else:
         form = forms.EditBookForm(instance=book)
         print('passé par else:')
-    return render(request, 'blog/edit_ticket.html', context={'form': form, 'book': book, 'ticket': ticket})
+    return render(request, 'blog/edit_ticket.html',
+                  context={'form': form,
+                           'book': book,
+                           'ticket': ticket}
+                  )
 
 
 def edit_review(request, review_id, book_id):
@@ -219,16 +254,27 @@ def edit_review(request, review_id, book_id):
     book_form = forms.CreateBookOptionalForm(instance=book)
     review_form = forms.EditReviewForm(instance=review)
     if request.method == 'POST':
-        book_form = forms.CreateBookOptionalForm(request.POST, request.FILES, instance=book)
+        book_form = forms.CreateBookOptionalForm(request.POST,
+                                                 request.FILES,
+                                                 instance=book
+                                                 )
         review_form = forms.EditReviewForm(request.POST, instance=review)
         if book_form.is_valid() and review_form.is_valid():
             book_form.save()
             review_form.save()
-            models.Review.objects.filter(id=review_id).update(date=datetime.datetime.now())
+            models.Review.objects.filter(id=review_id).update(
+                date=datetime.datetime.now()
+            )
             return redirect('home')
     else:
         book_form = forms.CreateBookOptionalForm(instance=book)
-    return render(request, 'blog/edit_review.html', context={'book_form': book_form, 'review_form': review_form, 'book': book, 'review': review, 'current_user': current_user})
+    return render(request, 'blog/edit_review.html',
+                  context={'book_form': book_form,
+                           'review_form': review_form,
+                           'book': book,
+                           'review': review,
+                           'current_user': current_user}
+                  )
 
 
 def delete_item(request, item_id, item_type):
@@ -241,15 +287,17 @@ def delete_item(request, item_id, item_type):
         item.delete()
         return redirect('home')
 
-    return render(request, 'blog/delete_ticket.html', context={'item': item})
+    return render(request, 'blog/delete_ticket.html',
+                  context={'item': item})
 
 
 def just_book_form(request):
     form = forms.CreateBookOptionalForm()
-    return render(request, 'blog/isolated_book_form.html', context={'form': form})
+    return render(request, 'blog/isolated_book_form.html',
+                  context={'form': form}
+                  )
 
-
-# TODO : Checker tous les paramètres on_delete (Un user qui delete un livre qu'il a submit doit faire delete tout ce qui concerne ce livre ? etc...)
+# TODO : Validation W3C html / css ? Comment faire
 
 # DONE : Image par défaut, resize image, fix préremplissage modification de ticket, fix des heures UTC+2,
 # DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user
