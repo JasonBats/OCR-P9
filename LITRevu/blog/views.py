@@ -228,7 +228,6 @@ def manage_users_relations(request):
 def edit_ticket(request, ticket_id, book_id):
     ticket = models.Ticket.objects.get(id=ticket_id)
     book = models.Book.objects.get(id=book_id)
-    form = forms.EditBookForm(instance=book)
     if request.method == 'POST':
         form = forms.EditBookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
@@ -239,7 +238,6 @@ def edit_ticket(request, ticket_id, book_id):
             return redirect('home')
     else:
         form = forms.EditBookForm(instance=book)
-        print('passé par else:')
     return render(request, 'blog/edit_ticket.html',
                   context={'form': form,
                            'book': book,
@@ -251,7 +249,6 @@ def edit_review(request, review_id, book_id):
     current_user = request.user
     review = models.Review.objects.get(id=review_id)
     book = models.Book.objects.get(id=book_id)
-    book_form = forms.CreateBookOptionalForm(instance=book)
     review_form = forms.EditReviewForm(instance=review)
     if request.method == 'POST':
         book_form = forms.CreateBookOptionalForm(request.POST,
