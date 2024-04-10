@@ -11,7 +11,9 @@ class User(AbstractUser):
         (READER, 'Lecteur'),
     )
 
-    role = models.CharField(max_length=30, choices=ROLE_CHOICES, verbose_name='Rôle')
+    role = models.CharField(max_length=30,
+                            choices=ROLE_CHOICES,
+                            verbose_name='Rôle')
     followers = models.ManyToManyField(
         'self',
         symmetrical=False,
