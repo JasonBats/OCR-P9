@@ -22,6 +22,9 @@ def home(request):
         review_details = (review, 'review')
         if review.author in user_followers or review.author == user:
             feed.append(review_details)
+        if review.ticket:
+            if review.ticket.author == user:
+                feed.append(review_details)  # TODO : Ca en fait du if ici...
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
     return render(request, 'blog/home.html',
                   context={'feed': sorted_feed,
@@ -141,14 +144,21 @@ def book_details(request, book_id):
 
 
 def item_details(request, item_id, item_type):  # item_type pour savoir si il faut taper Ticket.objects.all() ou autre chose. Arrive de home.html
+    reviews_to_display = []
     if item_type == 'ticket':
         item = models.Ticket.objects.get(id=item_id)
         details_type = 'ticket'
+        reviews_to_display = []
+        associated_reviews = models.Review.objects.all()
+        for review in associated_reviews:
+            if review.ticket_id == item_id:
+                reviews_to_display.append(review)
+        print(reviews_to_display)
     elif item_type == 'review':
         item = models.Review.objects.get(id=item_id)
         details_type = 'review'
     book = item.book
-    return render(request, 'blog/item_details.html', context={'item': item, 'book': book, 'details_type': details_type})
+    return render(request, 'blog/item_details.html', context={'item': item, 'book': book, 'details_type': details_type, 'reviews_to_display': reviews_to_display})
 
 
 def relations(request):
@@ -245,3 +255,5 @@ def just_book_form(request):
 # DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user
 # DONE : Ne pas pouvoir modifier un livre qu'on n'a pas posté (ajout champ "submitted_by" à la classe Book
 # DONE : View pour répondre directement à un ticket avec formulaire prérempli et immuable
+# DONE : Ajouter liste des reviews associées à un ticket
+# DONE : Afficher dans le feed les réponses à mes tickets par des users que je ne follow pas
