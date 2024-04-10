@@ -364,3 +364,9 @@ button.login {
     margin: 1em;
 }
 
+.review_associated {
+    border: 1px solid #d6d8d5;
+    border-radius: 15px;
+    margin: 30px;
+    padding: 15px;
+}
