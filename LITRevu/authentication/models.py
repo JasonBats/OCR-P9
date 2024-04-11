@@ -20,3 +20,10 @@ class User(AbstractUser):
         related_name='followed_by',
         verbose_name='followers'
     )
+
+    blocking = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        related_name='blocked_by',
+        verbose_name='blocking'
+    )

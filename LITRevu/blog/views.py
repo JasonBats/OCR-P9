@@ -1,29 +1,34 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import authentication.models as auth_models
 from . import forms, models
 import datetime
+from django.core.serializers import serialize
 
 
 @login_required
 def home(request):
     user = request.user
     user_followers = user.followers.all()
-    print(user_followers)
     tickets = models.Ticket.objects.all()
     reviews = models.Review.objects.all()
     feed = []
+    blocked_by = []
+    for blocking_user in user.blocked_by.all():
+        blocked_by.append(blocking_user)
     for ticket in tickets:
         ticket_details = (ticket, 'ticket')
         if ticket.author in user_followers or ticket.author == user:
             feed.append(ticket_details)
     for review in reviews:
         review_details = (review, 'review')
-        if review.author in user_followers or review.author == user:
-            feed.append(review_details)
-        if review.ticket:
-            if review.ticket.author == user and review_details not in feed:
-                feed.append(review_details)  # TODO : Ca en fait du if ici...
+        if review.author not in user.blocked_by.all():
+            if review.author in user_followers or review.author == user:
+                feed.append(review_details)
+            if review.ticket:
+                if review.ticket.author == user and review_details not in feed:
+                    feed.append(review_details)  # TODO : Ca en fait du if ici...
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
     return render(request, 'blog/home.html',
                   context={'feed': sorted_feed,
@@ -33,27 +38,32 @@ def home(request):
                   )
 
 
+@login_required
 def posts(request):
-    user = request.user
+    current_user = request.user
     tickets = models.Ticket.objects.all()
     reviews = models.Review.objects.all()
     feed = []
+    blocked_by = []
+    for blocking_user in current_user.blocked_by.all():
+        blocked_by.append(blocking_user)
     for ticket in tickets:
-        if ticket.author != user:
+        if ticket.author != current_user and ticket.author not in blocked_by:
             ticket_details = (ticket, 'ticket')
             feed.append(ticket_details)
     for review in reviews:
-        if review.author != user:
+        if review.author != current_user and review.author not in blocked_by:
             review_details = (review, 'review')
             feed.append(review_details)
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
     return render(request, 'blog/home.html',
                   context={'feed': sorted_feed,
-                           'user': user,
+                           'user': current_user,
                            }
                   )
 
 
+@login_required
 def create_ticket(request):
     form = forms.CreateBookForm()
     if request.method == 'POST':
@@ -78,6 +88,7 @@ def create_ticket(request):
                   )
 
 
+@login_required
 def create_review(request):
     review_form = forms.CreateReviewForm()
     book_form = forms.CreateBookForm()
@@ -119,6 +130,7 @@ def create_review(request):
                   )
 
 
+@login_required
 def create_review_answer_ticket(request, book_id, ticket_id):
     book = models.Book.objects.get(id=book_id)
     ticket = models.Ticket.objects.get(id=ticket_id)
@@ -128,7 +140,6 @@ def create_review_answer_ticket(request, book_id, ticket_id):
         review_form = forms.CreateReviewFormAnswerTicket(request.POST)
         review_form.book = book_id
         if review_form.is_valid():
-            print('form is valid oui')
             review_instance = models.Review.objects.create(
                 author=request.user,
                 date=datetime.datetime.now(),
@@ -149,17 +160,7 @@ def create_review_answer_ticket(request, book_id, ticket_id):
                   )
 
 
-def explore_db(request):
-    books = models.Book.objects.all()
-    tickets = models.Ticket.objects.all()
-    reviews = models.Review.objects.all()
-    return render(request, 'blog/explore_db.html',
-                  context={'books': books,
-                           'tickets': tickets,
-                           'reviews': reviews}
-                  )
-
-
+@login_required
 def book_details(request, book_id):
     book = models.Book.objects.get(id=book_id)
     return render(request, 'blog/book_details.html',
@@ -167,6 +168,7 @@ def book_details(request, book_id):
                   )
 
 
+@login_required
 def item_details(request, item_id, item_type):
     reviews_to_display = []
     if item_type == 'ticket':
@@ -177,7 +179,6 @@ def item_details(request, item_id, item_type):
         for review in associated_reviews:
             if review.ticket_id == item_id:
                 reviews_to_display.append(review)
-        print(reviews_to_display)
     elif item_type == 'review':
         item = models.Review.objects.get(id=item_id)
         details_type = 'review'
@@ -190,26 +191,36 @@ def item_details(request, item_id, item_type):
                   )
 
 
+@login_required
 def relations(request):
     current_user = request.user
     users = auth_models.User.objects.all()
     public_users = []
+    search_form = forms.SearchUserForm()
     for user in users:
         if not user.is_staff:
             public_users.append(user)
-    public_users.remove(current_user)
+    if not current_user.is_staff:
+        public_users.remove(current_user)
     sorted_users = sorted(public_users, key=lambda u: u.username)
     followed_users = request.user.followers.all()
     followed_by = request.user.followed_by.all()
+    blocked_users = request.user.blocking.all()
+    blocked_by = request.user.blocked_by.all()
     return render(request,
                   'blog/relations.html',
                   context={'sorted_users': sorted_users,
                            'followed_users': followed_users,
                            'current_user': current_user,
-                           'followed_by': followed_by})
+                           'followed_by': followed_by,
+                           'blocked_users': blocked_users,
+                           'blocked_by': blocked_by,
+                           'search_form': search_form,
+                           })
 
 
-def manage_users_relations(request):
+@login_required
+def follow_unfollow(request):
     if request.method == 'POST':
         user = request.user
         followers = []
@@ -225,6 +236,41 @@ def manage_users_relations(request):
     return redirect('relations')
 
 
+def stop_following_me(request):
+    if request.method == 'POST':
+        user = request.user
+        followed_by = []
+        for other_member in user.followed_by.all():
+            followed_by.append(other_member)
+        user_to_verify = request.POST.get('user_to_verify')
+        user_to_verify = auth_models.User.objects.get(pk=user_to_verify)
+        user_to_verify.followers.remove(user)
+
+    return redirect('relations')
+
+
+@login_required
+def block_unblock(request):
+    if request.method == 'POST':
+        user = request.user
+        blocking = []
+        for other_member in user.blocking.all():
+            blocking.append(other_member)
+        user_to_verify = request.POST.get('user_to_verify')
+        user_to_verify = auth_models.User.objects.get(pk=user_to_verify)
+        if user_to_verify not in blocking:
+            user.blocking.add(user_to_verify)
+            if user in user_to_verify.followers.all():
+                user_to_verify.followers.remove(user)
+            if user_to_verify in user.followers.all():
+                user.followers.remove(user_to_verify)
+        else:
+            user.blocking.remove(user_to_verify)
+
+    return redirect('relations')
+
+
+@login_required
 def edit_ticket(request, ticket_id, book_id):
     ticket = models.Ticket.objects.get(id=ticket_id)
     book = models.Book.objects.get(id=book_id)
@@ -245,6 +291,7 @@ def edit_ticket(request, ticket_id, book_id):
                   )
 
 
+@login_required
 def edit_review(request, review_id, book_id):
     current_user = request.user
     review = models.Review.objects.get(id=review_id)
@@ -274,8 +321,8 @@ def edit_review(request, review_id, book_id):
                   )
 
 
+@login_required
 def delete_item(request, item_id, item_type):
-    print(item_id, item_type)
     if item_type == 'ticket':
         item = models.Ticket.objects.get(id=item_id)
     elif item_type == 'review':
@@ -288,13 +335,24 @@ def delete_item(request, item_id, item_type):
                   context={'item': item})
 
 
+@login_required
 def just_book_form(request):
     form = forms.CreateBookOptionalForm()
     return render(request, 'blog/isolated_book_form.html',
                   context={'form': form}
                   )
 
+
+def search_user_filter(request):
+    search_query = request.GET.get('search', '')
+    users = auth_models.User.objects.filter(username__icontains=search_query)
+    serialized_users = list(users.values())
+    print(len(serialized_users))
+    print(serialized_users)
+    return JsonResponse({'users': serialized_users})
+
 # TODO : Validation W3C html / css ? Comment faire
+# TODO : Champ texte pour recherche d'utilisateurs ?
 
 # DONE : Image par défaut, resize image, fix préremplissage modification de ticket, fix des heures UTC+2,
 # DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user
@@ -302,3 +360,4 @@ def just_book_form(request):
 # DONE : View pour répondre directement à un ticket avec formulaire prérempli et immuable
 # DONE : Ajouter liste des reviews associées à un ticket
 # DONE : Afficher dans le feed les réponses à mes tickets par des users que je ne follow pas
+# DONE : Permettre de bloquer un user : Plus dans le feed, plus dans les posts, plus dans les suggestions d'utilisateurs, plus dans ses / mes follows

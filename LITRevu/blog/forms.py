@@ -69,3 +69,8 @@ class EditReviewForm(forms.ModelForm):
     class Meta:
         model = models.Review
         fields = ['review_title', 'rating', 'book', 'ticket', 'review_text']
+
+
+class SearchUserForm(forms.Form):
+    search = forms.CharField(required=False)
+    fields = ['search']

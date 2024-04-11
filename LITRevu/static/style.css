@@ -259,17 +259,28 @@ button.login {
     flex-direction: column;
     width: 80%;
     margin: 0 auto;
+    color: #0e1117;
 }
 
-.user-list p {
+.user-list div {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    background-color: white;
     margin: 5px;
     padding: 15px;
     align-items: center;
     border-radius: 15px;
+    background-color: #0e1117;
+    color: #C1CAD2;
+}
+
+.user-list section {
+    display: flex;
+    flex-direction: row;
+}
+
+.user-list section form {
+    margin: 0;
 }
 
 .user-list button {
@@ -277,8 +288,8 @@ button.login {
     padding: 10px;
     color: #027373;
     font-weight: 700;
+    border: none;
     border-radius: 8px;
-    border: 2px solid #027373;
 }
 
 .user-list .follow:hover {
@@ -369,4 +380,24 @@ button.login {
     border-radius: 15px;
     margin: 30px;
     padding: 15px;
+}
+
+.search-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #0e1117;
+    border: 1px solid white;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.search-card h2 {
+    margin: 0;
+}
+
+.search-card input {
+    border: none;
+    padding: 15px;
+    border-radius: 30px;
+    width: 50%;
 }
