@@ -14,13 +14,6 @@
                 {% elif item.1 == "review" %}
                     <a href="{% url 'edit_review' item.0.id item.0.book.id %}">Modifier review ?</a>
                 {% endif %}
-                    <!-- ----------------------- vvvvv À SUPPRIMER vvvvv ----------------------- -->
-                    <form action="{% url 'edit_ticket' item.0.id item.0.book.id %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="ticket_to_edit" value="{{ item.0.id }}">
-                        <button type="submit" >Modifier</button>
-                    </form>
-                    <!-- ----------------------- ^^^^^ À SUPPRIMER ^^^^^ ----------------------- -->
                     <form action="{% url 'delete_item' item.1 item.0.id %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="item_to_delete" value="{{ item.0.id }}, {{ item.1 }}">
@@ -35,7 +28,6 @@
                 {% endif %}
             </div>
                 <p class="timestamp"><i>{{ item.0.date }}</i></p>
-                <!-- -------------------- DEBUT NOUVEAU SCRIPT ICI -------------------- -->
                 <p>{% if item.1 == "review" %}
                     {% for rank in item.0.rating|get_range %}
                         <object type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
@@ -43,8 +35,8 @@
                     {% for rank in item.0.rating|get_range_two_values:5 %}
                         <object type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
                     {% endfor %}
+                    <b>{{ item.0.review_title }}</b>
                 {% endif %}</p>
-                <!-- -------------------- FIN NOUVEAU SCRIPT ICI -------------------- -->
                 {% if item.0.ticket %}
                     <div class="ticket-response">
                         <div class="original-post">

@@ -146,7 +146,7 @@ def create_review_answer_ticket(request, book_id, ticket_id):
                 review_title=review_form.cleaned_data['review_title'],
                 rating=review_form.cleaned_data['rating'],
                 book=book,
-                ticket=review_form.cleaned_data['ticket'],
+                ticket=ticket,
                 review_text=review_form.cleaned_data['review_text'],
             )
             models.Review.objects.filter(id=review_instance.id).update(
