@@ -344,15 +344,17 @@ def just_book_form(request):
 
 
 def search_user_filter(request):
+    current_user = request.user
     search_query = request.GET.get('search', '')
-    users = auth_models.User.objects.filter(username__icontains=search_query)
-    serialized_users = list(users.values())
-    print(len(serialized_users))
-    print(serialized_users)
+    all_users = auth_models.User.objects.all().exclude(
+        username__icontains=current_user.username,
+        ).filter(is_staff__exact=0)
+    print(all_users)
+    found_users = all_users.filter(username__icontains=search_query)
+    serialized_users = list(found_users.values())
     return JsonResponse({'users': serialized_users})
 
 # TODO : Validation W3C html / css ? Comment faire
-# TODO : Champ texte pour recherche d'utilisateurs ?
 
 # DONE : Image par défaut, resize image, fix préremplissage modification de ticket, fix des heures UTC+2,
 # DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user
@@ -361,3 +363,4 @@ def search_user_filter(request):
 # DONE : Ajouter liste des reviews associées à un ticket
 # DONE : Afficher dans le feed les réponses à mes tickets par des users que je ne follow pas
 # DONE : Permettre de bloquer un user : Plus dans le feed, plus dans les posts, plus dans les suggestions d'utilisateurs, plus dans ses / mes follows
+# DONE : Champ de texte pour rechercher un utilisateur
