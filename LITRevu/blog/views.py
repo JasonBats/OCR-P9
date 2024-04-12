@@ -354,13 +354,4 @@ def search_user_filter(request):
     serialized_users = list(found_users.values())
     return JsonResponse({'users': serialized_users})
 
-# TODO : Validation W3C html / css ? Comment faire
-
-# DONE : Image par défaut, resize image, fix préremplissage modification de ticket, fix des heures UTC+2,
-# DONE : Refactor lien modifier une review | Fix titre et url des feed_item | Ne pas pouvoir s'auto-follow + fix page posts avec les posts de request.user
-# DONE : Ne pas pouvoir modifier un livre qu'on n'a pas posté (ajout champ "submitted_by" à la classe Book
-# DONE : View pour répondre directement à un ticket avec formulaire prérempli et immuable
-# DONE : Ajouter liste des reviews associées à un ticket
-# DONE : Afficher dans le feed les réponses à mes tickets par des users que je ne follow pas
-# DONE : Permettre de bloquer un user : Plus dans le feed, plus dans les posts, plus dans les suggestions d'utilisateurs, plus dans ses / mes follows
-# DONE : Champ de texte pour rechercher un utilisateur
+# TODO : Validation W3C html / css
