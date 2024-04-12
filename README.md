@@ -31,7 +31,7 @@ A Django project enabling a community of users to publish book or article review
 ***
 
 ## Use it
-### What you can do :
+### What can be done :
 
 - Ask for a review about a new book
 - Answer tickets with your review
