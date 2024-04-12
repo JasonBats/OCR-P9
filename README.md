@@ -1,10 +1,8 @@
 # Python/Django - Book review platfrom "LITRevu"
 
-***
 
 A Django project enabling a community of users to publish book or article reviews and browse or request reviews on demand.
 
-***
 
 ## Start project :
 
