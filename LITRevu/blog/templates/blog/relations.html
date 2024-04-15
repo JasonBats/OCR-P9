@@ -117,7 +117,6 @@
         let inputSearch = document.querySelector('#id_search')
         let searchResults = document.querySelector('.user-list')
         inputSearch.addEventListener("keyup", function(){
-            console.log(inputSearch.value)
             let searchValue = encodeURIComponent(inputSearch.value);
             let url = `/search_users/?search=${searchValue}`
             fetch(url, {
