@@ -22,8 +22,7 @@ class Book(models.Model):
     book_cover = models.ImageField(verbose_name='Couverture',
                                    default='default_book_cover.jpg')
     submitted_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                     on_delete=models.SET_NULL,
-                                     null=True)
+                                     on_delete=models.SET_NULL, null=True)
 
     IMAGE_MAX_SIZE = (168, 300)
 
