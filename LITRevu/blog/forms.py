@@ -20,7 +20,10 @@ class CreateBookForm(forms.ModelForm):
 
     class Meta:
         model = models.Book
-        fields = ['title', 'author', 'date', 'book_cover']
+        fields = ['title', 'author', 'date', 'book_cover', 'submitted_by']
+        widgets = {
+            'submitted_by': forms.HiddenInput()
+        }
 
 
 class CreateBookOptionalForm(forms.ModelForm):
@@ -31,7 +34,10 @@ class CreateBookOptionalForm(forms.ModelForm):
 
     class Meta:
         model = models.Book
-        fields = ['title', 'author', 'date', 'book_cover']
+        fields = ['title', 'author', 'date', 'book_cover', 'submitted_by']
+        widgets = {
+            'submitted_by': forms.HiddenInput()
+        }
 
 
 class CreateReviewForm(forms.ModelForm):
