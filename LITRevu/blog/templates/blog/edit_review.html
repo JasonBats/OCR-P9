@@ -7,7 +7,6 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {% if book.submitted_by == current_user %}
-        <p>Oui c'est bien le user</p>
         <p>{{ book_form.as_p }}</p>
     {% endif %}
     <p>{{ review_form.as_p }}</p>
