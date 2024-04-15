@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 import authentication.models as auth_models
 from . import forms, models
 import datetime
-from django.core.serializers import serialize
 
 
 @login_required
@@ -28,7 +27,7 @@ def home(request):
                 feed.append(review_details)
             if review.ticket:
                 if review.ticket.author == user and review_details not in feed:
-                    feed.append(review_details)  # TODO : Ca en fait du if ici...
+                    feed.append(review_details)
     sorted_feed = sorted(feed, key=lambda item: item[0].date, reverse=True)
     return render(request, 'blog/home.html',
                   context={'feed': sorted_feed,
@@ -65,12 +64,14 @@ def posts(request):
 
 @login_required
 def create_ticket(request):
-    form = forms.CreateBookForm()
+    form = forms.CreateBookForm(initial={'submitted_by': request.user})
     if request.method == 'POST':
         form = forms.CreateBookForm(request.POST, request.FILES)
         if form.is_valid():
             now = datetime.datetime.now()
-            book_instance = form.save()
+            book_instance = form.save(commit=False)
+            book_instance.submitted_by = request.user
+            book_instance.save()
             ticket_instance = models.Ticket.objects.create(
                 author=request.user,
                 book=book_instance,
@@ -91,10 +92,10 @@ def create_ticket(request):
 @login_required
 def create_review(request):
     review_form = forms.CreateReviewForm()
-    book_form = forms.CreateBookForm()
+    book_form = forms.CreateBookOptionalForm(initial={'submitted_by': request.user})
     if request.method == 'POST':
         review_form = forms.CreateReviewForm(request.POST)
-        book_form = forms.CreateBookForm(request.POST, request.FILES)
+        book_form = forms.CreateBookOptionalForm(request.POST, request.FILES, initial={'submitted_by': request.user})
         if review_form.is_valid():
             if request.POST['book']:
                 review_instance = models.Review.objects.create(
@@ -119,11 +120,9 @@ def create_review(request):
                 models.Review.objects.filter(id=review_instance.id).update(
                     date=datetime.datetime.now()
                 )
-            # else:
-            #     messages.error(request, 'formulaires pas valides')
-            return render(request, 'blog/create_review.html',
-                          context={'review_form': review_form,
-                                   'book_form': book_form})
+
+            return redirect('home')
+
     return render(request, 'blog/create_review.html',
                   context={'review_form': review_form,
                            'book_form': book_form}
@@ -303,13 +302,21 @@ def edit_review(request, review_id, book_id):
                                                  instance=book
                                                  )
         review_form = forms.EditReviewForm(request.POST, instance=review)
-        if book_form.is_valid() and review_form.is_valid():
-            book_form.save()
+        if review_form.is_valid():
             review_form.save()
             models.Review.objects.filter(id=review_id).update(
                 date=datetime.datetime.now()
             )
-            return redirect('home')
+        if request.POST['book']:
+            if book_form.is_valid():
+                book_form.save()
+                return redirect('home')
+            else:
+                for field, errors in book_form.errors.items():
+                    print(f"Field '{field}': {', '.join(errors)}")
+
+        return redirect('home')
+
     else:
         book_form = forms.CreateBookOptionalForm(instance=book)
     return render(request, 'blog/edit_review.html',
@@ -337,7 +344,7 @@ def delete_item(request, item_id, item_type):
 
 @login_required
 def just_book_form(request):
-    form = forms.CreateBookOptionalForm()
+    form = forms.CreateBookOptionalForm(initial={'submitted_by': request.user})
     return render(request, 'blog/isolated_book_form.html',
                   context={'form': form}
                   )
