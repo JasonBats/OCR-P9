@@ -92,10 +92,15 @@ def create_ticket(request):
 @login_required
 def create_review(request):
     review_form = forms.CreateReviewForm()
-    book_form = forms.CreateBookOptionalForm(initial={'submitted_by': request.user})
+    book_form = forms.CreateBookOptionalForm(initial={
+        'submitted_by': request.user
+    })
     if request.method == 'POST':
         review_form = forms.CreateReviewForm(request.POST)
-        book_form = forms.CreateBookOptionalForm(request.POST, request.FILES, initial={'submitted_by': request.user})
+        book_form = forms.CreateBookOptionalForm(request.POST,
+                                                 request.FILES,
+                                                 initial={
+                                                     'submitted_by': request.user})
         if review_form.is_valid():
             if request.POST['book']:
                 review_instance = models.Review.objects.create(
