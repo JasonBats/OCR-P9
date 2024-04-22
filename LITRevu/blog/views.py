@@ -10,6 +10,12 @@ import datetime
 
 @login_required
 def home(request):
+    """
+    Displays items regarding relations to other users (blocked, followed etc.),
+     and their types (review or tickets) after the homepage rules.
+    :param request:
+    :return: Sorted feed
+    """
     user = request.user
     user_followers = user.followers.all()
     tickets = models.Ticket.objects.all()
@@ -41,6 +47,12 @@ def home(request):
 
 @login_required
 def posts(request):
+    """
+    Displays items regarding relations to other users (blocked, followed etc.),
+     and their types (review or tickets) after the posts page rules.
+    :param request:
+    :return: Sorted feed
+    """
     current_user = request.user
     tickets = models.Ticket.objects.all()
     reviews = models.Review.objects.all()
@@ -66,6 +78,12 @@ def posts(request):
 
 @login_required
 def create_ticket(request):
+    """
+    Displays the book creation form to create a ticket. Book information are
+    informed by the user and ticket information are automatically created.
+    :param request:
+    :return: Ticket creation view
+    """
     form = forms.CreateBookForm(initial={'submitted_by': request.user})
     if request.method == 'POST':
         form = forms.CreateBookForm(request.POST, request.FILES)
@@ -93,6 +111,12 @@ def create_ticket(request):
 
 @login_required
 def create_review(request):
+    """
+    Displays the review creation form. Book information are selected among
+     the existing books or created with an optional book form.
+    :param request:
+    :return: Review creation view
+    """
     review_form = forms.CreateReviewForm()
     book_form = forms.CreateBookOptionalForm(initial={
         'submitted_by': request.user
@@ -141,6 +165,15 @@ def create_review(request):
 
 @login_required
 def create_review_answer_ticket(request, book_id, ticket_id):
+    """
+    Displays the review creation form where a book, and a ticket are instantiated.
+    :param request:
+    :param book_id:Int
+        Id of the reviewed book
+    :param ticket_id:Int
+        Id of the answered ticket
+    :retun: Review creation view.
+    """
     book = models.Book.objects.get(id=book_id)
     ticket = models.Ticket.objects.get(id=ticket_id)
     review_form = forms.CreateReviewFormAnswerTicket()
@@ -171,6 +204,14 @@ def create_review_answer_ticket(request, book_id, ticket_id):
 
 @login_required
 def book_details(request, book_id):
+    """
+    Displays book details, used in various pages (i.e., ticket details
+    or review details views)
+    :param request:
+    :param book_id:Int
+        Id of detailed book to display.
+    :return: View of book details.
+    """
     book = models.Book.objects.get(id=book_id)
     return render(request, 'blog/book_details.html',
                   context={'book': book}
@@ -179,6 +220,14 @@ def book_details(request, book_id):
 
 @login_required
 def item_details(request, item_id, item_type):
+    """
+    Displays the details of the item, whether it is a ticket or a review.
+    :param request:
+    :param item_id:
+    :param item_type:str
+        'ticket' or 'review', for templating purposes.
+    :return: A detailed page of the item.
+    """
     reviews_to_display = []
     if item_type == 'ticket':
         item = models.Ticket.objects.get(id=item_id)
@@ -198,6 +247,15 @@ def item_details(request, item_id, item_type):
 
 @login_required
 def relations(request):
+    """
+    Displays the main page to manage the relations between users.
+    Displays a search bar where all users can be reached, and all the existing
+    foreignkeys between current user and others (blocking / blocked_by,
+    and followed by / followed).
+    Those relations can be modified in this view.
+    :param request:
+    :return: Relations page view.
+    """
     current_user = request.user
     users = auth_models.User.objects.all()
     public_users = []
@@ -244,6 +302,13 @@ def block_unblock(request):
 
 @login_required
 def edit_ticket(request, ticket_id, book_id):
+    """
+    Edit an existing ticket using the ticket form instantiated.
+    :param request:
+    :param ticket_id:Int.
+    :param book_id:Int.
+    :return: Edit ticket view page.
+    """
     ticket = models.Ticket.objects.get(id=ticket_id)
     book = models.Book.objects.get(id=book_id)
     if request.method == 'POST':
@@ -265,6 +330,13 @@ def edit_ticket(request, ticket_id, book_id):
 
 @login_required
 def edit_review(request, review_id, book_id):
+    """
+    Edit an existing ticket using the review form instantiated.
+    :param request:
+    :param review_id:Int.
+    :param book_id:Int.
+    :return: Edit review view page.
+    """
     current_user = request.user
     review = models.Review.objects.get(id=review_id)
     book = models.Book.objects.get(id=book_id)
@@ -303,6 +375,15 @@ def edit_review(request, review_id, book_id):
 
 @login_required
 def delete_item(request, item_id, item_type):
+    """
+    A quick form displayed as a button to delete an item, whether it is a
+    ticket or a review.
+    :param request:
+    :param item_id:Int.
+    :param item_type:Str.
+        'ticket' or 'review' to filter objects of the right type.
+    :return: Delete form.
+    """
     if item_type == 'ticket':
         item = models.Ticket.objects.get(id=item_id)
     elif item_type == 'review':
@@ -317,6 +398,12 @@ def delete_item(request, item_id, item_type):
 
 @login_required
 def just_book_form(request):
+    """
+    Isolated book creation form for where it is optional
+    (review creation page).
+    :param request:
+    :return: Isolated book form.
+    """
     form = forms.CreateBookOptionalForm(initial={'submitted_by': request.user})
     return render(request, 'blog/isolated_book_form.html',
                   context={'form': form}
