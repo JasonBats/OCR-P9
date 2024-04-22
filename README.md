@@ -26,7 +26,7 @@ A Django project enabling a community of users to publish book or article review
 
 #### 5 - Generate flake8 report
 
-`flake-8 --format=html --htmldir=flake8_report --exclude=ENV,.idea`
+`flake8 --format=html --htmldir=flake8_report --exclude=ENV,.idea`
 
 ***
 
