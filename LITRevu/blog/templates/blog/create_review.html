@@ -3,25 +3,37 @@
 <div class="content-creation-form">
     <h2>Création de reviews</h2>
     <h3>Livre</h3>
+    <div class="new-book-toggle-div">Nouveau livre :
+        <a href="#">
+        <label class="switch"><input type="checkbox" onclick="toggleNewBookForm()">
+            <span class="slider round"></span>
+        </label>
+        </a>
+    </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="review-creation">
-        <div>{{ review_form.as_p }}</div>
-        <div id="new_book_form" style="display:none;">test</div>
+        <div id="review_form">{{ review_form.as_p }}</div>
+        <div id="new_book_form" style="display:none;"></div>
         </div>
-        <a href="#" onclick="toggleNewBookForm()">Nouveau livre</a>
         <button type="submit">Enregistrer la review</button>
     </form>
     <script>
     function toggleNewBookForm() {
         const newBookForm = document.getElementById('new_book_form');
+        const book_selector = document.getElementById('review_form').children[2]
+        const ticket_selector = document.getElementById('review_form').children[3]
         if (newBookForm.style.display === 'none') {
             newBookForm.style.display = 'block';
+            book_selector.style.display = 'none';
+            ticket_selector.style.display = 'none';
             fetch('{% url 'just_book_form' %}')
                 .then(response => response.text())
                 .then(data => newBookForm.innerHTML = data)
         } else {
             newBookForm.style.display = 'none';
+            book_selector.style.display = 'block'
+            ticket_selector.style.display = 'block';
             newBookForm.innerHTML = 'rien'
         }
     }
