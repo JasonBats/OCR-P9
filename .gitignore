@@ -1,0 +1,8 @@
+ENV/
+main.py
+LITRevu/BACKUP - db.sqlite3
+.idea/
+LITRevu/authentication/migrations/__pycache__/
+LITRevu/blog/migrations/__pycache__/
+LITRevu/blog/templatetages/__pycache__/
+LITRevu/__pycache__/

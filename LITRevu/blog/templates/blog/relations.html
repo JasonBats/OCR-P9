@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="home">
+<div class="search-card">
+    <h2>Rechercher un membre</h2>
+    <form>
+        {{ search_form.as_p }}
+    </form>
+    <div class="user-list">
+    </div>
+</div>
+    <h2>Liste des membres:</h2>
+    <div class="user-list">
+    {% for user in sorted_users %}
+        {% if user not in blocked_by %}
+            <div><p>{{ user.username }}</p>
+                <section class="user_relations_buttons">
+                    {% if user not in followed_users and user not in blocked_users %}
+                        <form action="{% url 'follow_unfollow' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="follow">Suivre</button>
+                        <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                        </form>
+                    {% elif user in followed_users %}
+                        <form action="{% url 'follow_unfollow' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: #027373;color: white;">Suivi(e)</button>
+                        <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                        </form>
+                    {% else %}
+                    {% endif %}
+                    {% if user not in blocked_users %}
+                        <form action="{% url 'block_unblock' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="follow">Bloquer</button>
+                        <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                        </form>
+                    {% elif user in blocked_users %}
+                        <form action="{% url 'block_unblock' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: #027373;color: white;">Débloquer</button>
+                        <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                        </form>
+                    {% endif %}
+                </section>
+            </div>
+            {% endif %}
+    {% endfor %}
+    </div>
+<!-- Membres suivis -->
+{% if followed_users %}
+    <h2>Membres suivis :</h2>
+    <div class="user-list">
+    {% for user in followed_users %}
+        <div>
+            <p>{{ user.username }}</p>
+            <section>
+                <form action="{% url 'follow_unfollow' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Ne plus suivre</button>
+                    <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                </form>
+            </section>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+<!-- fin Membres suivis -->
+
+<!-- Membres bloqués -->
+{% if blocked_users %}
+    <h2>Membres bloqués :</h2>
+    <div class="user-list">
+    {% for user in blocked_users %}
+        <div>
+            <p>{{ user.username }}</p>
+            <section>
+                <form action="{% url 'block_unblock' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" style="background-color: #027373;color: white;">Débloquer</button>
+                    <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                </form>
+            </section>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+<!-- fin Membres bloqués -->
+
+<!-- Membres abonnés -->
+{% if followed_by %}
+    <h2>Membres abonnés :</h2>
+    <div class="user-list">
+    {% for user in followed_by %}
+        <div>
+            <p>{{ user.username }}</p>
+            <section>
+                <form action="{% url 'stop_following_me' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Supprimer</button>
+                    <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                </form>
+                <form action="{% url 'block_unblock' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Bloquer</button>
+                    <input type="hidden" name="user_to_verify" value="{{ user.id }}"/>
+                </form>
+            </section>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+<!-- fin Membres abonnés -->
+</div>
+    <script type="text/javascript">
+        let inputSearch = document.querySelector('#id_search')
+        let searchResults = document.querySelector('.user-list')
+        inputSearch.addEventListener("keyup", function(){
+            let searchValue = encodeURIComponent(inputSearch.value);
+            let url = `/search_users/?search=${searchValue}`
+            fetch(url, {
+                    method: 'GET',
+                    headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                    }
+                }
+            )
+            .then((response) => response.json())
+            .then((data) => {
+                searchResults.innerHTML = '';
+
+                if (searchValue === '') {
+                    return;
+                }
+
+                data.users.some((user) => {
+                    console.log(user)
+                    let userElement = document.createElement('div')
+                    userElement.classList.add('searchResultDiv')
+
+                    userElement.innerHTML = `
+
+
+            <p>${user.username}</p>
+                <section class="user_relations_buttons">
+                    <form action="{% url "follow_unfollow" %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="follow">Follow / Unfollow</button>
+                    <input type="hidden" name="user_to_verify" value="${user.id}"/>
+                    </form>
+                    <form action="{% url "block_unblock" %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="follow">Bloquer / Débloquer</button>
+                    <input type="hidden" name="user_to_verify" value="${user.id}"/>
+                    </form>
+                </section>
+
+
+`;
+                    console.log(user.username)
+                    searchResults.appendChild(userElement);
+
+                    return true;
+                })
+                console.log(data)
+            })
+        })
+
+    </script>
+{% endblock content %}
+
+

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="content-creation-form">
+        <h2>Création de ticket - demande de critique</h2>
+        <h3>Livre</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Enregistrer la demande</button>
+        </form>
+    </div>
+{% endblock content %}

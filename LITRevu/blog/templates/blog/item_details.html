@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+    {% load custom_filters %}
+<main class="details">
+    {% if details_type == 'ticket' %}
+        <div class="user-content">
+            <h2>Demande de critique à propos de {{ book.title }}</h2>
+            <p>Demande formulée par <b>{{ item.author }}</b></p>
+            <p>Le {{ item.date }}</p>
+            <p><button class="create-review-button"><a href="{% url 'create_review_answer_ticket' item.book.id item.id %}">Déposer une critique</a></button></p>
+        </div>
+    {% elif details_type == 'review' %}
+        <div class="user-content">
+            <h2>Critique de {{ book.title }}</h2>
+            <h3>{{ item.author }} : ❝ {{ item.review_title }} ❞</h3>
+            <div class="rating">
+                {% for rank in item.rating|get_range %}
+                    <object type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+                {% endfor %}
+                {% for rank in item.rating|get_range_two_values:5 %}
+                    <object type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+                {% endfor %}
+            </div>
+        <p>Date de la critique : {{ item.date }}</p>
+        <p> {{ item.review_text }}</p>
+        </div>
+        {% endif %}
+        <hr style="opacity: 0">
+        <div class="book-details">
+            <h3>Détails de {{ book.title }}</h3>
+            <p>Auteur : <b>{{ book.author}}</b></p>
+            <p>Parution en <b>{{ book.date}}</b></p>
+            <img alt="Book cover" class="book_cover_details" src="{{ book.book_cover.url }}">
+        </div>
+</main>
+<aside class="aside_reviews">
+{% for review in reviews_to_display %}
+    <div class="review_associated">
+        <p><b>❝ {{ review.review_title }} ❞ </b><i>par {{ review.author }}</i></p>
+        <p>Le {{ review.date }}</p>
+        {% for rank in review.rating|get_range %}
+            <object type="image/svg+xml" data="{% static 'yellow-star.svg' %}"></object>
+        {% endfor %}
+        {% for rank in review.rating|get_range_two_values:5 %}
+            <object type="image/svg+xml" data="{% static 'grey-star.svg' %}"></object>
+        {% endfor %}
+        <p>{{ review.review_text }}</p>
+    </div>
+{% endfor %}
+</aside>
+{% endblock content %}

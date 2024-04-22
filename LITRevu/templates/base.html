@@ -1,0 +1,34 @@
+{% load static %}
+{% load custom_filters %}
+<html>
+<head>
+    <title>LITRevu</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav>
+    <p><a href="{% url 'home' %}"><img alt="logo" class="logo" src="{% static 'logo.png' %}">LITRevu</a></p>
+    {% if user.is_authenticated %}
+        <div class="navbuttons">
+            <a href="{% url 'home' %}">Flux</a>
+            <a href="{% url 'posts' %}">Posts</a>
+            <a href="{% url 'relations' %}">Abonnements</a>
+            <form method="post" action="{% url 'logout' %}"><button type="submit"> {% csrf_token %}Se déconnecter</button></form>
+        </div>
+    {% endif %}
+</nav>
+{% if user.is_authenticated %}
+    <div class="main-buttons">
+        <a href="{% url 'create_ticket' %}"><button class="">Demander une critique</button></a>
+        <a href="{% url 'create_review' %}"><button class="">Déposer une critique</button></a>
+    </div>
+{% endif %}
+<div class="main">{% block content %}{% endblock content %}</div>
+{% if user.is_authenticated %}
+    <p>Bonjour {{ user }}</p>
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Ticket créé !</h2>
+{% csrf_token %}
+
+<p>Vous avez créé une demande de critique à propos du livre ci-dessous :</p>
+<p>{{ book.title }}</p>
+<p>de {{ book.author }}</p>
+<img src="{{ book.book_cover.url }}">
+<p>paru en {{ book.date }}</p>
+{% endblock content %}

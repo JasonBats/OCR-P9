@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Modification de ticket - demande de critique</h2>
+<h3>Livre</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ ticket.book }}
+    {{ ticket.book.author }}
+    {{ ticket.date }}
+    <p>
+        {{ form.as_p }}
+    </p>
+    <button type="submit">Enregistrer la demande</button>
+</form>
+{% endblock content %}

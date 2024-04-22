@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+    <main class="details">
+            <div class="user-content">
+                <h2>Critique de {{ book.title }}</h2>
+                <h3>Demande de critique de la part de : {{ ticket.author }}</h3>
+                <div class="rating">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="review-creation">
+                        <div>{{ review_form.as_p }}</div>
+                        </div>
+                        <button type="submit">Enregistrer la review</button>
+                    </form>
+                </div>
+            <p> {{ item.review_text }}</p>
+            </div>
+            <hr style="opacity: 0">
+            <div class="book-details">
+                <h3>Détails de {{ book.title }}</h3>
+                <p>Auteur : <b>{{ book.author}}</b></p>
+                <p>Parution en <b>{{ book.date}}</b></p>
+                <img alt="Book cover" class="book_cover_details" src="{{ book.book_cover.url }}">
+            </div>
+
+    </main>
+{% endblock content %}
