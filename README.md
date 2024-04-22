@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # OCR-P9
 Django app
 =======
@@ -46,5 +45,3 @@ A Django project enabling a community of users to publish book or article review
 - Homepage : Watch activity from users you follow, answers to your tickets and your own activity
 - Posts : Watch all activity about every other users
 - Abonnements : Search users and manage your relations (follow / unfollow / ban / unban)
-
->>>>>>> master
