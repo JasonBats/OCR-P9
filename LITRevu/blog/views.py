@@ -1,7 +1,9 @@
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-import authentication.models as auth_models
+from authentication import models as auth_models
+from django.views.decorators.http import require_http_methods
+from .utils import block_unblock_method, stop_following_me_method, follow_unfollow_method
+
 from . import forms, models
 import datetime
 
@@ -97,10 +99,13 @@ def create_review(request):
     })
     if request.method == 'POST':
         review_form = forms.CreateReviewForm(request.POST)
-        book_form = forms.CreateBookOptionalForm(request.POST,
-                                                 request.FILES,
-                                                 initial={
-                                                     'submitted_by': request.user})
+        book_form = forms.CreateBookOptionalForm(
+            request.POST,
+            request.FILES,
+            initial={
+                'submitted_by': request.user
+            }
+        )
         if review_form.is_valid():
             if request.POST['book']:
                 review_instance = models.Review.objects.create(
@@ -178,11 +183,7 @@ def item_details(request, item_id, item_type):
     if item_type == 'ticket':
         item = models.Ticket.objects.get(id=item_id)
         details_type = 'ticket'
-        reviews_to_display = []
-        associated_reviews = models.Review.objects.all()
-        for review in associated_reviews:
-            if review.ticket_id == item_id:
-                reviews_to_display.append(review)
+        reviews_to_display = models.Review.objects.all().filter(ticket_id=item_id)
     elif item_type == 'review':
         item = models.Review.objects.get(id=item_id)
         details_type = 'review'
@@ -225,52 +226,19 @@ def relations(request):
 
 @login_required
 def follow_unfollow(request):
-    if request.method == 'POST':
-        user = request.user
-        followers = []
-        for other_member in user.followers.all():
-            followers.append(other_member)
-        user_to_verify = request.POST.get('user_to_verify')
-        user_to_verify = auth_models.User.objects.get(pk=user_to_verify)
-        if user_to_verify not in followers:
-            user.followers.add(user_to_verify)
-        else:
-            user.followers.remove(user_to_verify)
-
+    follow_unfollow_method(request)
     return redirect('relations')
 
 
 def stop_following_me(request):
-    if request.method == 'POST':
-        user = request.user
-        followed_by = []
-        for other_member in user.followed_by.all():
-            followed_by.append(other_member)
-        user_to_verify = request.POST.get('user_to_verify')
-        user_to_verify = auth_models.User.objects.get(pk=user_to_verify)
-        user_to_verify.followers.remove(user)
-
+    stop_following_me_method(request)
     return redirect('relations')
 
 
 @login_required
+@require_http_methods(["POST"])
 def block_unblock(request):
-    if request.method == 'POST':
-        user = request.user
-        blocking = []
-        for other_member in user.blocking.all():
-            blocking.append(other_member)
-        user_to_verify = request.POST.get('user_to_verify')
-        user_to_verify = auth_models.User.objects.get(pk=user_to_verify)
-        if user_to_verify not in blocking:
-            user.blocking.add(user_to_verify)
-            if user in user_to_verify.followers.all():
-                user_to_verify.followers.remove(user)
-            if user_to_verify in user.followers.all():
-                user.followers.remove(user_to_verify)
-        else:
-            user.blocking.remove(user_to_verify)
-
+    block_unblock_method(request)
     return redirect('relations')
 
 
@@ -353,17 +321,3 @@ def just_book_form(request):
     return render(request, 'blog/isolated_book_form.html',
                   context={'form': form}
                   )
-
-
-def search_user_filter(request):
-    current_user = request.user
-    search_query = request.GET.get('search', '')
-    all_users = auth_models.User.objects.all().exclude(
-        username__icontains=current_user.username,
-        ).filter(is_staff__exact=0)
-    print(all_users)
-    found_users = all_users.filter(username__icontains=search_query)
-    serialized_users = list(found_users.values())
-    return JsonResponse({'users': serialized_users})
-
-# TODO : Validation W3C html / css

@@ -64,7 +64,7 @@ urlpatterns = [
          blog.views.create_review_answer_ticket,
          name='create_review_answer_ticket'),
     path('search_users/',
-         blog.views.search_user_filter,
+         blog.utils.search_user_method,
          name='search_users')
 ]
 
